@@ -102,11 +102,29 @@ PersonalWorkFlow/
 | `cloud-devops` | IaC、CI/CD、容器、SLO |
 | `code-reviewer` | PR review、安全/效能 |
 | `dba` | Schema 設計、慢查詢優化 |
-| `decision-advisor` | Munger/Graham/Jobs 決策框架 |
+| `decision-advisor` | **決策思維框架**（見下方） |
 | `fullstack-dev` | 前後端全端開發 |
 | `pm` | 產品週期、PRD、路線圖 |
 | `sa` | 系統架構、DDD、ADR |
 | `security` | OWASP、威脅建模 |
+
+#### `decision-advisor` — 三位思想家決策框架
+
+面對重要決策時，呼叫三種截然不同的心智模型：
+
+| 觸發詞 | 思想家 | 核心工具 |
+|---|---|---|
+| `芒格` / `逆向思考` / `認知偏誤` | Charlie Munger | 逆向推演、激勵結構分析、能力圈邊界 |
+| `創業視角` / `PG view` | Paul Graham | 第一性原則、先做不可擴展的事、Default alive/dead |
+| `產品直覺` / `Jobs view` | Steve Jobs | 從使用者體驗反推技術、極致聚焦、砍掉什麼 |
+| （不加觸發詞）| 三者合璧 | 自動掃描三個視角、找交集訊號、說明分歧、給建議 |
+
+使用範例：
+```
+「我在考慮要不要加這個功能，給我逆向思考」
+「這個架構決策，Jobs view 怎麼看？」
+「我該選 A 還是 B？」  ← 自動三視角合璧
+```
 
 > 完整說明見 [skills-reference.md](docs/guides/skills-reference.md)
 
