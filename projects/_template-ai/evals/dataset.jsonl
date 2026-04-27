@@ -1,0 +1,4 @@
+# Eval dataset — one JSON object per line (JSONL format)
+# Each case: { "id": "...", "input": {"question": "..."}, "expected": {"answer": "..."} }
+# Example:
+# {"id": "001", "input": {"question": "What is X?"}, "expected": {"answer": "X is ..."}}

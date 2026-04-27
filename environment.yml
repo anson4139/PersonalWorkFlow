@@ -1,0 +1,54 @@
+# PersonalWorkFlow — Python 工作環境
+#
+# 建立環境：
+#   conda env create -f environment.yml -p .conda
+#
+# 更新環境：
+#   conda env update -f environment.yml -p .conda --prune
+#
+# 啟動環境：
+#   conda activate d:\<path>\PersonalWorkFlow\.conda
+#
+# 凍結目前狀態（維護用）：
+#   conda list -p .conda --export > environment.yml
+
+name: personalworkflow
+
+channels:
+  - defaults
+
+dependencies:
+  # Python 直譯器
+  - python=3.12
+
+  # pip 管理
+  - pip
+
+  - pip:
+    # --- 資料處理 ---
+    - pandas>=2.2
+    - numpy>=2.0
+    - scipy>=1.13
+    - scikit-learn>=1.5
+
+    # --- 視覺化 ---
+    - matplotlib>=3.9
+
+    # --- 深度學習（CPU 版，GPU 環境請改 torch+cu124）---
+    - torch>=2.3; sys_platform == "win32"
+
+    # --- 資料庫 & ORM ---
+    - sqlalchemy>=2.0
+    - pyodbc>=5.0
+
+    # --- 文件處理 ---
+    - python-docx>=1.1
+    - pdfplumber>=0.11
+    - pypdf>=4.0
+
+    # --- HTTP & 工具 ---
+    - requests>=2.31
+    - python-dotenv>=1.0
+
+    # --- 開發品質 ---
+    - ruff>=0.4

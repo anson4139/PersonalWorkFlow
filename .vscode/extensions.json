@@ -1,0 +1,27 @@
+{
+    // VS Code 建議安裝的擴充套件清單
+    // 首次開啟此工作區時會自動提示安裝
+    "recommendations": [
+        // AI 助手
+        "github.copilot",
+        "github.copilot-chat",
+        // Python 開發
+        "ms-python.python",
+        "ms-python.pylance",
+        "charliermarsh.ruff",
+        // .NET / C# 開發
+        "ms-dotnettools.csdevkit",
+        "ms-dotnettools.csharp",
+        // 前端開發
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        // 編輯器品質
+        "editorconfig.editorconfig",
+        // Markdown
+        "yzhang.markdown-all-in-one",
+        // YAML
+        "redhat.vscode-yaml",
+        // Git
+        "eamodio.gitlens"
+    ]
+}

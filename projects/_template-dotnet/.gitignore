@@ -1,0 +1,24 @@
+# ASP.NET Core secrets (never commit)
+**/appsettings.*.json
+!**/appsettings.json
+!**/appsettings.Development.json
+
+# .NET build artifacts
+bin/
+obj/
+*.user
+
+# User secrets
+**/.vs/
+**/*.suo
+
+# Rider
+.idea/
+
+# Environment
+.env
+*.env
+
+# Test results
+TestResults/
+coverage/

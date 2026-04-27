@@ -1,0 +1,14 @@
+# Core LLM SDK — pick one
+openai>=1.0.0
+# anthropic>=0.30.0
+# ollama>=0.3.0
+
+# Config & environment
+pyyaml>=6.0
+python-dotenv>=1.0
+
+# HTTP
+httpx>=0.27.0
+
+# Utilities
+tenacity>=8.0        # Retry with backoff for LLM calls

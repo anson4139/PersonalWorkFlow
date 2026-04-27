@@ -1,0 +1,19 @@
+# AI Model Configuration
+# Lock model versions here so behavior is reproducible.
+
+primary:
+  provider: openai          # openai | anthropic | ollama | azure_openai
+  model: gpt-4o-mini
+  temperature: 0.2
+  max_tokens: 2048
+
+fallback:
+  provider: ollama
+  model: qwen2.5:14b
+  temperature: 0.2
+  max_tokens: 2048
+
+embedding:
+  provider: openai
+  model: text-embedding-3-small
+  dimensions: 1536

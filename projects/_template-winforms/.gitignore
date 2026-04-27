@@ -1,0 +1,14 @@
+# .NET build artifacts
+bin/
+obj/
+*.user
+
+# Visual Studio
+.vs/
+*.suo
+
+# Rider
+.idea/
+
+# Test results
+TestResults/

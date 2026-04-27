@@ -1,0 +1,21 @@
+# Ruff configuration — Python linter + formatter
+# https://docs.astral.sh/ruff/
+
+line-length = 100
+target-version = "py312"
+
+[lint]
+# E/W: pycodestyle, F: pyflakes, I: isort, UP: pyupgrade, B: flake8-bugbear
+select = ["E", "W", "F", "I", "UP", "B"]
+ignore = [
+    "E501",  # line too long — enforced by formatter instead
+    "B008",  # do not perform function calls in default arguments
+]
+
+[lint.isort]
+known-first-party = ["src"]
+
+[format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "lf"

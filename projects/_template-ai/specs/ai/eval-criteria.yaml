@@ -1,0 +1,23 @@
+# AI Evaluation Criteria
+# Define what "good output" looks like for each capability.
+
+capabilities:
+  - name: answer_quality
+    metric: correctness
+    threshold: 0.85
+    method: llm_judge       # llm_judge | exact_match | regex | human
+
+  - name: citation_accuracy
+    metric: precision
+    threshold: 0.90
+    method: exact_match
+
+  - name: hallucination_rate
+    metric: rate
+    threshold: 0.05         # Max 5% hallucination
+    method: llm_judge
+
+  - name: latency_p95
+    metric: seconds
+    threshold: 5.0
+    method: timer

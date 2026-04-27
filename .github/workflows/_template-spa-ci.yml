@@ -1,0 +1,62 @@
+# CI workflow for .NET API + React/Vite SPA projects
+# Copy to: projects/<name>/.github/workflows/ci.yml
+
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  api-test:
+    name: API (dotnet)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Test
+        run: dotnet test --no-build --configuration Release --verbosity normal
+
+  client-test:
+    name: Client (Node)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: src/MyApp.Client/package-lock.json
+
+      - name: Install
+        working-directory: src/MyApp.Client
+        run: npm ci
+
+      - name: Type check
+        working-directory: src/MyApp.Client
+        run: npx tsc --noEmit
+
+      - name: Test
+        working-directory: src/MyApp.Client
+        run: npm test -- --run
+
+      - name: Build
+        working-directory: src/MyApp.Client
+        run: npm run build

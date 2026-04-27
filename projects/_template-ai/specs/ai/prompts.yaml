@@ -1,0 +1,19 @@
+# Prompt Templates
+# Format: each entry is a named prompt with a version and template string.
+# Use {variable} for runtime substitution.
+
+system_prompt:
+  version: "1.0"
+  template: |
+    You are a helpful assistant for [project name].
+    [Add role-specific instructions here.]
+
+user_query:
+  version: "1.0"
+  template: |
+    Context:
+    {context}
+
+    Question: {question}
+
+    Answer concisely and cite sources where relevant.

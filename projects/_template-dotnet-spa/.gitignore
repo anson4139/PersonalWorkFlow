@@ -1,0 +1,27 @@
+# .NET build artifacts
+bin/
+obj/
+*.user
+
+# User secrets / Visual Studio
+**/.vs/
+**/*.suo
+
+# Rider
+.idea/
+
+# Frontend
+src/MyApp.Client/node_modules/
+src/MyApp.Client/dist/
+
+# Environment
+.env
+*.env
+
+# ASP.NET Core secrets (keep base + Development, ignore others)
+**/appsettings.Production.json
+**/appsettings.Staging.json
+
+# Test results
+TestResults/
+coverage/

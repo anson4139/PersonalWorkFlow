@@ -1,0 +1,50 @@
+<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site.Master.cs" Inherits="MyApp.SiteMaster" %>
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head runat="server">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%: Page.Title %> - MyApp</title>
+
+    <link rel="stylesheet" href="Content/bootstrap.min.css" />
+    <link rel="stylesheet" href="Content/site.css" />
+    <asp:ContentPlaceHolder ID="HeadContent" runat="server" />
+</head>
+<body>
+    <form runat="server">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container">
+                <a class="navbar-brand" href="<%: ResolveUrl("~/") %>">MyApp</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#navbarNav" aria-controls="navbarNav"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="<%: ResolveUrl("~/Pages/Default.aspx") %>">Home</a>
+                        </li>
+                        <asp:ContentPlaceHolder ID="NavItems" runat="server" />
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <main role="main" class="pb-3">
+            <div class="container mt-4">
+                <asp:ContentPlaceHolder ID="MainContent" runat="server" />
+            </div>
+        </main>
+
+        <footer class="border-top footer text-muted">
+            <div class="container text-center py-3">
+                &copy; <%: DateTime.Now.Year %> MyApp
+            </div>
+        </footer>
+
+        <script src="Content/bootstrap.bundle.min.js"></script>
+        <asp:ContentPlaceHolder ID="ScriptsContent" runat="server" />
+    </form>
+</body>
+</html>

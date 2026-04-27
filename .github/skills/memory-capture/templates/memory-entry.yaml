@@ -1,0 +1,9 @@
+- id: FACT-{YYYYMMDD}-{SEQ}
+  claim: "The finding or decision statement."
+  source:
+    type: "file" # or "conversation"
+    path: "path/to/source/file.md"
+    evidence: "L10-L20" # Line numbers or anchor
+  confidence: "high" # low, medium, high
+  updated_at: "{YYYY-MM-DD}"
+  tags: ["tag1", "tag2"]

@@ -1,0 +1,46 @@
+root = true
+
+# All files
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+# C# / .NET
+[*.{cs,csx}]
+indent_size = 4
+
+# .NET project files (XML-based)
+[*.{csproj,vbproj,sln,targets,props,config,xml,resx}]
+indent_size = 2
+
+# JavaScript / TypeScript / React
+[*.{js,ts,jsx,tsx,mjs,cjs}]
+indent_size = 2
+
+# JSON / JSONC
+[*.{json,jsonc}]
+indent_size = 2
+
+# YAML
+[*.{yaml,yml}]
+indent_size = 2
+
+# Markdown — preserve trailing spaces (line breaks)
+[*.md]
+trim_trailing_whitespace = false
+
+# Python
+[*.py]
+indent_size = 4
+
+# Shell scripts
+[*.{sh,bash}]
+end_of_line = lf
+
+# PowerShell
+[*.{ps1,psm1,psd1}]
+end_of_line = crlf

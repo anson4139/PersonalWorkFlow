@@ -1,0 +1,173 @@
+# facts.yaml — Agent Long-Term Memory
+# Managed by memory-capture / memory-recall skills.
+#
+# Schema v2 — adds category, project scope, expires, deprecated flag.
+#
+# Fields:
+#   id          FACT-YYYYMMDD-SEQ
+#   category    architecture | decision | pattern | constraint | workflow | env
+#   project     _global  OR  projects/<name>
+#   claim       The verified finding or decision (one sentence).
+#   source
+#     type      file | conversation
+#     path      workspace-relative path (omit for conversation)
+#     evidence  line range or section anchor
+#   confidence  low | medium | high
+#   created     YYYY-MM-DD
+#   updated_at  YYYY-MM-DD
+#   expires     YYYY-MM-DD or null (null = never expires)
+#   deprecated  false (set true when a fact is superseded, do not delete)
+#   tags        list of strings
+#
+# Example:
+#
+# - id: FACT-20260427-001
+#   category: architecture
+#   project: _global
+#   claim: "copilot-instructions.md at workspace root is auto-injected into every Copilot session."
+#   source:
+#     type: file
+#     path: .github/copilot-instructions.md
+#     evidence: L1-L5
+#   confidence: high
+#   created: "2026-04-27"
+#   updated_at: "2026-04-27"
+#   expires: null
+#   deprecated: false
+#   tags: [framework, copilot, config]
+
+facts:
+
+  - id: FACT-20260427-001
+    category: architecture
+    project: _global
+    claim: "Opening PersonalWorkFlow from the root workspace is required for all skills to be available; opening a sub-project standalone loses parent skill injection."
+    source:
+      type: conversation
+    confidence: high
+    created: "2026-04-27"
+    updated_at: "2026-04-27"
+    expires: null
+    deprecated: false
+    tags: [framework, copilot, skills, workspace]
+
+  - id: FACT-20260427-002
+    category: architecture
+    project: _global
+    claim: "projects/_template-ai/ includes evals/ with run_evals.py and dataset.jsonl; eval results must pass before merging to main."
+    source:
+      type: file
+      path: projects/_template-ai/evals/run_evals.py
+      evidence: L1-L10
+    confidence: high
+    created: "2026-04-27"
+    updated_at: "2026-04-27"
+    expires: null
+    deprecated: false
+    tags: [framework, ai, evals, template]
+
+  - id: FACT-20260427-003
+    category: decision
+    project: _global
+    claim: "WebForms targets .NET Framework 4.8 only — it does NOT support .NET Core/5+. Use old-style (non-SDK) .csproj with ProjectTypeGuids."
+    source:
+      type: file
+      path: projects/_template-webforms/src/MyApp/MyApp.csproj
+      evidence: L1-L10
+    confidence: high
+    created: "2026-04-27"
+    updated_at: "2026-04-27"
+    expires: null
+    deprecated: false
+    tags: [dotnet, webforms, framework-version]
+
+  - id: FACT-20260427-004
+    category: architecture
+    project: _global
+    claim: "All projects in this framework must use four SDLC-aligned top-level directories: specs/ (contracts), src/ (code), tests/ (verification), docs/ (decisions)."
+    source:
+      type: file
+      path: docs/decisions/adr-001-sdlc-folder-structure.md
+      evidence: "Decision section"
+    confidence: high
+    created: "2026-04-27"
+    updated_at: "2026-04-27"
+    expires: null
+    deprecated: false
+    tags: [architecture, sdlc, folder-structure, all-templates]
+
+  - id: FACT-20260427-005
+    category: architecture
+    project: _global
+    claim: "AI skills are distributed across three platforms: .github/skills/ (Copilot, 19 skills), .agent/skills/ (Claude for Work, 29 = 19 common + 10 agent roles), .claude/skills/ (Claude Code, 19 skills). Thesis-specific skills (codebase-search-rules, thesis-dev-execution) were removed 2026-04-27."
+    source:
+      type: file
+      path: docs/architecture/skill-sync-design.md
+      evidence: "Three-platform section"
+    confidence: high
+    created: "2026-04-27"
+    updated_at: "2026-04-27"
+    expires: null
+    deprecated: false
+    tags: [architecture, skills, copilot, claude, three-platform]
+
+  - id: FACT-20260427-006
+    category: constraint
+    project: _global
+    claim: "All source files must be UTF-8. Python scripts must include sys.stdout.reconfigure(encoding='utf-8') to prevent mojibake in Windows terminals."
+    source:
+      type: file
+      path: .github/copilot-instructions.md
+      evidence: "Section 4B: File Encodings"
+    confidence: high
+    created: "2026-04-27"
+    updated_at: "2026-04-27"
+    expires: null
+    deprecated: false
+    tags: [constraint, encoding, python, windows]
+
+  - id: FACT-20260427-007
+    category: pattern
+    project: _global
+    claim: "Commit messages must follow Conventional Commits: <type>(<scope>): <description>. Allowed types: feat|fix|docs|chore|refactor|test|ci|perf|style."
+    source:
+      type: file
+      path: .github/copilot-instructions.md
+      evidence: "Section 4E: Commit Convention"
+    confidence: high
+    created: "2026-04-27"
+    updated_at: "2026-04-27"
+    expires: null
+    deprecated: false
+    tags: [pattern, git, commit, convention]
+
+  - id: FACT-20260427-008
+    category: pattern
+    project: _global
+    claim: "All Markdown documents with multiple chapters must wrap each top-level ## section in <details><summary> collapsible blocks. Exceptions: document header, TOC, single-section files."
+    source:
+      type: file
+      path: .github/copilot-instructions.md
+      evidence: "Section 4D: Markdown Document Structure"
+    confidence: high
+    created: "2026-04-27"
+    updated_at: "2026-04-27"
+    expires: null
+    deprecated: false
+    tags: [pattern, markdown, documentation, collapsible]
+
+  - id: FACT-20260427-009
+    category: env
+    project: _global
+    claim: "Python environment is managed by conda at .conda/ (prefix-based). Rebuild with: conda env create -f environment.yml -p .conda. Python version: 3.12."
+    source:
+      type: file
+      path: environment.yml
+      evidence: "dependencies section"
+    confidence: high
+    created: "2026-04-27"
+    updated_at: "2026-04-27"
+    expires: null
+    deprecated: false
+    tags: [env, conda, python, setup]
+
