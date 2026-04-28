@@ -1,3 +1,19 @@
+# Anthropic-owned Skills (© 2025 Anthropic, PBC. All rights reserved.)
+# These skills are governed by Anthropic's Terms of Service and may NOT be
+# redistributed. Install them separately from Claude for Work / claude.ai.
+.github/skills/docx/
+.github/skills/pdf/
+.github/skills/pptx/
+.github/skills/xlsx/
+.agent/skills/docx/
+.agent/skills/pdf/
+.agent/skills/pptx/
+.agent/skills/xlsx/
+.claude/skills/docx/
+.claude/skills/pdf/
+.claude/skills/pptx/
+.claude/skills/xlsx/
+
 # Security: Environment Variables
 .env
 .env.local

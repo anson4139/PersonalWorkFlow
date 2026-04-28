@@ -84,12 +84,15 @@ PersonalWorkFlow/
 
 ## AI Skills
 
+> **注意**：`docx` / `pptx` / `pdf` / `xlsx` 四個 Skill 版權歸 Anthropic 所有（© 2025 Anthropic, PBC.），受 [Anthropic 服務條款](https://www.anthropic.com/legal/consumer-terms) 限制，**不包含在此 repo 中**，無法再散布。
+> 請透過 Claude for Work / claude.ai 的 Skill 功能自行取得安裝。
+
 ### 通用 Skill（Copilot / Claude Code / Claude for Work 三平台同步）
 
 | Skill | 觸發時機 |
 |---|---|
 | `doc-coauthoring` | 寫文件 / 提案 / 規格書 |
-| `docx` / `pptx` / `pdf` / `xlsx` | 操作 Office / PDF 檔案 |
+| `docx` / `pptx` / `pdf` / `xlsx` | 操作 Office / PDF 檔案（需自行從 Claude for Work 取得） |
 | `frontend-design` | 設計 Web UI / 元件 |
 | `canvas-design` / `algorithmic-art` | 視覺設計 / 生成藝術 |
 | `theme-factory` | 套用 UI 主題 |
