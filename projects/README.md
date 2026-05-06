@@ -32,6 +32,7 @@
 
 | 日期       | 提案                       | 對應專案                      | 異動摘要                                                                                                                                          |
 | ---------- | -------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-05-07 | 06-v4-exam-study-platform  | `01-exam-study-platform/`     | V4 v0.7 **結案**：MVP 全數完成上線——三 Tab 架構（單題/10題/對戰）、4支 API、remote D1 migrations、20張怪獸圖、exam.buclaw.org 正式部署            |
 | 2026-05-07 | 06-v4-exam-study-platform  | `01-exam-study-platform/`     | V4 v0.6：修正介面架構——對戰模式為 Home.tsx 第三 Tab（取代「測試模式」），保留單題/10題兩 Tab；BattlePage 改為接受 initialKey/initialSession props |
 | 2026-05-07 | 06-v4-exam-study-platform  | `01-exam-study-platform/`     | V4 v0.5：修正怪獸切換規則——切換觸發改為 HP 歸零事件驅動，`qPerMonster` 僅作傷害量計算，非題目輪換依據                                             |
 | 2026-05-07 | 06-v4-exam-study-platform  | `01-exam-study-platform/`     | V4 v0.4：怪獸素材就位，20 張 PNG 縮放至 512×512 並存入 `src/web/public/images/monsters/`                                                          |

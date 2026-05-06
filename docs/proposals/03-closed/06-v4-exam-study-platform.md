@@ -7,7 +7,7 @@
 
 | 項目     | 內容                               |
 | -------- | ---------------------------------- |
-| 狀態     | `drafting`                         |
+| 狀態     | `closed`                           |
 | 建立日期 | 2026-05-07                         |
 | 最後更新 | 2026-05-07                         |
 | 對應專案 | `projects/01-exam-study-platform/` |
@@ -19,6 +19,7 @@
 
 | 日期       | 版本 | 更新人 | 變更說明                                                                                                                                                                                 |
 | ---------- | ---- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-05-07 | v0.7 | Anson  | 結案：MVP 全數完成並部署至 exam.buclaw.org；完成事項：DB migrations（remote D1）、4 支 API functions、BattlePage（三 Tab 架構）、20 張怪獸圖片（512px）、auth fallback、git push to main |
 | 2026-05-07 | v0.6 | Anson  | 修正介面架構：對戰模式應為 Home.tsx 第三個 Tab（取代舊「測試模式」），而非獨立頁面；保留「單題模式」「10題模式」兩個 Tab 原有行為；BattlePage 改為接受 initialKey / initialSession props |
 | 2026-05-07 | v0.5 | Anson  | 修正怪獸切換規則：切換觸發由 HP 歸零驅動，而非題目索引；修正 `qPerMonster` 定義、公式與流程圖                                                                                            |
 | 2026-05-07 | v0.4 | Anson  | 怪獸素材就位：20 張 PNG（1254→512px）存入 `src/web/public/images/monsters/`，命名符合 `{id}-idle｜battle.png` 規格                                                                       |
@@ -862,20 +863,31 @@ single monster character asset, full body, centered composition, front 3/4 view,
 
 > 進入 active 後填入。
 
-| 里程碑                       | 預計日期 | 狀態        |
-| ---------------------------- | -------- | ----------- |
-| 提案確認 / 待確認事項拍板    | —        | not-started |
-| 怪獸素材交付                 | —        | not-started |
-| 資料表 Schema 設計與建立     | —        | not-started |
-| 前端怪獸對戰畫面（無後端版） | —        | not-started |
-| 後端 API 串接（D1 歷程寫入） | —        | not-started |
-| MVP 整合測試與部署           | —        | not-started |
+| 里程碑                       | 預計日期   | 狀態        |
+| ---------------------------- | ---------- | ----------- |
+| 提案確認 / 待確認事項拍板    | —          | not-started |
+| 怪獸素材交付                 | —          | not-started |
+| 資料表 Schema 設計與建立     | —          | not-started |
+| 前端怪獸對戰畫面（無後端版） | 2026-05-07 | done        |
+| 後端 API 串接（D1 歷程寫入） | 2026-05-07 | done        |
+| MVP 整合測試與部署           | 2026-05-07 | done        |
 
 </details>
 
 <details>
 <summary>## 結案 / 擱置 / 作廢備註</summary>
 
-> 尚未結案。
+**2026-05-07 結案**
+
+MVP 全數完成並上線：
+
+- 三 Tab 架構：單題模式 / 10題模式 / ⚔ 對戰模式（第三 Tab 取代舊測試模式）
+- 4 支後端 API：`/api/quiz/session`、`/api/quiz/answer`、`/api/quiz/result`、`/api/quiz/history`
+- DB migrations 已 apply 至 remote D1（`exam-study-platform-access`）
+- 20 張怪獸圖片（512×512 PNG，透明背景）部署至 CF Pages
+- 怪獸切換為 HP 歸零事件驅動
+- 已部署正式站：https://exam.buclaw.org
+
+第二階段功能（音效、連擊、排行榜等）留待未來提案。
 
 </details>
