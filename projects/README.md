@@ -30,18 +30,19 @@
 
 > 每次提案新增、狀態變更或重大實作里程碑，在此補一筆。最新在上。
 
-| 日期       | 提案                       | 對應專案                      | 異動摘要                                                                                                |
-| ---------- | -------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------- |
-| 2026-05-07 | 06-v4-exam-study-platform  | `01-exam-study-platform/`     | V4 v0.5：修正怪獸切換規則——切換觸發改為 HP 歸零事件驅動，`qPerMonster` 僅作傷害量計算，非題目輪換依據   |
-| 2026-05-07 | 06-v4-exam-study-platform  | `01-exam-study-platform/`     | V4 v0.4：怪獸素材就位，20 張 PNG 縮放至 512×512 並存入 `src/web/public/images/monsters/`                |
-| 2026-05-07 | 06-v4-exam-study-platform  | `01-exam-study-platform/`     | V4 v0.3：更新 AI 怪獸圖生成語法，改為透明背景優先，加入各怪獸 Rim Light 色表與 Negative Prompt          |
-| 2026-05-07 | 06-v4-exam-study-platform  | `01-exam-study-platform/`     | V4 v0.2：確認全數 14 項決策；新增動態題數規則、RWD 單畫面設計規格、AI 怪獸圖生成語法、DiceBear 頭像方案 |
-| 2026-05-07 | 06-v4-exam-study-platform  | `01-exam-study-platform/`     | V4 草案建立：遊戲化怪獸對戰答題模式，含規則設計、畫面配置、資料表結構、素材清單與 MVP 範圍              |
-| 2026-05-05 | 05-v3-exam-study-platform  | `01-exam-study-platform/`     | V3 結案：新增測試模式 MVP、PDF 全量轉換（105~115）、LLM 解析 2150 題、joan 授權、正式站部署             |
-| 2025-xx-xx | 04-v2-exam-study-platform  | `01-exam-study-platform/`     | V2 結案：（請補充摘要）                                                                                 |
-| 2025-xx-xx | 03-v1-exam-study-platform  | `01-exam-study-platform/`     | V1 結案：（請補充摘要）                                                                                 |
-| 2025-xx-xx | 02-personal-resume-website | `02-personal-resume-website/` | 個人履歷網站完成部署                                                                                    |
-| 2025-xx-xx | 01-exam-study-platform     | `01-exam-study-platform/`     | 考試學習平台提案建立                                                                                    |
+| 日期       | 提案                       | 對應專案                      | 異動摘要                                                                                                                                          |
+| ---------- | -------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-05-07 | 06-v4-exam-study-platform  | `01-exam-study-platform/`     | V4 v0.6：修正介面架構——對戰模式為 Home.tsx 第三 Tab（取代「測試模式」），保留單題/10題兩 Tab；BattlePage 改為接受 initialKey/initialSession props |
+| 2026-05-07 | 06-v4-exam-study-platform  | `01-exam-study-platform/`     | V4 v0.5：修正怪獸切換規則——切換觸發改為 HP 歸零事件驅動，`qPerMonster` 僅作傷害量計算，非題目輪換依據                                             |
+| 2026-05-07 | 06-v4-exam-study-platform  | `01-exam-study-platform/`     | V4 v0.4：怪獸素材就位，20 張 PNG 縮放至 512×512 並存入 `src/web/public/images/monsters/`                                                          |
+| 2026-05-07 | 06-v4-exam-study-platform  | `01-exam-study-platform/`     | V4 v0.3：更新 AI 怪獸圖生成語法，改為透明背景優先，加入各怪獸 Rim Light 色表與 Negative Prompt                                                    |
+| 2026-05-07 | 06-v4-exam-study-platform  | `01-exam-study-platform/`     | V4 v0.2：確認全數 14 項決策；新增動態題數規則、RWD 單畫面設計規格、AI 怪獸圖生成語法、DiceBear 頭像方案                                           |
+| 2026-05-07 | 06-v4-exam-study-platform  | `01-exam-study-platform/`     | V4 草案建立：遊戲化怪獸對戰答題模式，含規則設計、畫面配置、資料表結構、素材清單與 MVP 範圍                                                        |
+| 2026-05-05 | 05-v3-exam-study-platform  | `01-exam-study-platform/`     | V3 結案：新增測試模式 MVP、PDF 全量轉換（105~115）、LLM 解析 2150 題、joan 授權、正式站部署                                                       |
+| 2025-xx-xx | 04-v2-exam-study-platform  | `01-exam-study-platform/`     | V2 結案：（請補充摘要）                                                                                                                           |
+| 2025-xx-xx | 03-v1-exam-study-platform  | `01-exam-study-platform/`     | V1 結案：（請補充摘要）                                                                                                                           |
+| 2025-xx-xx | 02-personal-resume-website | `02-personal-resume-website/` | 個人履歷網站完成部署                                                                                                                              |
+| 2025-xx-xx | 01-exam-study-platform     | `01-exam-study-platform/`     | 考試學習平台提案建立                                                                                                                              |
 
 ---
 

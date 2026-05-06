@@ -103,16 +103,37 @@ function HpBar({
 }
 
 // ── Main Component ────────────────────────────────────────────────────────────
-export default function BattlePage() {
+interface BattlePageProps {
+  /** Pre-selected subject key passed from Home.tsx (embedded mode) */
+  initialKey?: SubjectKey;
+  /** Pre-selected session label passed from Home.tsx (embedded mode) */
+  initialSession?: string;
+  /** Called when user exits battle (← 換科目 / ✕ quit) in embedded mode */
+  onBack?: () => void;
+}
+
+export default function BattlePage({
+  initialKey,
+  initialSession,
+  onBack,
+}: BattlePageProps = {}) {
   const { viewer, loading: viewerLoading } = useViewer();
+
+  // Embedded mode: subject + session already chosen by Home.tsx
+  const isEmbedded = Boolean(initialKey && initialSession);
+  const hasAutoStarted = useRef(false);
 
   // Phase
   const [phase, setPhase] = useState<AppPhase>("select");
 
-  // Selection
+  // Selection — pre-filled when launched from Home.tsx
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
-  const [selectedKey, setSelectedKey] = useState<SubjectKey | null>(null);
-  const [selectedSession, setSelectedSession] = useState<string | null>(null);
+  const [selectedKey, setSelectedKey] = useState<SubjectKey | null>(
+    initialKey ?? null,
+  );
+  const [selectedSession, setSelectedSession] = useState<string | null>(
+    initialSession ?? null,
+  );
 
   // Game data
   const [sessionData, setSessionData] = useState<SessionData | null>(null);
@@ -174,6 +195,21 @@ export default function BattlePage() {
   useEffect(() => {
     answerStartTime.current = Date.now();
   }, [currentIndex]);
+
+  // Embedded mode: auto-start battle once subject data has loaded
+  useEffect(() => {
+    if (
+      !isEmbedded ||
+      hasAutoStarted.current ||
+      phase !== "select" ||
+      !subjectData ||
+      subjectLoading
+    )
+      return;
+    hasAutoStarted.current = true;
+    void handleStartBattle();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEmbedded, phase, subjectData, subjectLoading]);
 
   // ── API calls ──────────────────────────────────────────────────────────────
   const startSession = useCallback(
@@ -404,6 +440,15 @@ export default function BattlePage() {
     );
   }
 
+  // Embedded mode: skip select UI, show loading while auto-starting
+  if (isEmbedded && (phase === "select" || phase === "loading")) {
+    return (
+      <div className="h-dvh bg-black flex items-center justify-center text-green-400 text-sm">
+        準備對戰…
+      </div>
+    );
+  }
+
   // ── Select View ────────────────────────────────────────────────────────────
   if (phase === "select" || phase === "loading") {
     const selectedSubjectData = SUBJECTS.find((s) => s.key === selectedKey);
@@ -584,8 +629,13 @@ export default function BattlePage() {
           <div className="flex-none h-12 flex items-center justify-between px-4 border-b border-gray-800">
             <button
               onClick={() => {
-                if (confirm("退出後本次對戰不會記分，確定離開？"))
+                if (confirm("退出後本次對戰不會記分，確定離開？")) {
+                  if (onBack) {
+                    onBack();
+                    return;
+                  }
                   setPhase("select");
+                }
               }}
               className="text-gray-600 text-xs hover:text-gray-400"
             >
@@ -866,11 +916,14 @@ export default function BattlePage() {
           <div className="flex flex-col gap-3">
             <button
               onClick={() => {
-                setPhase("select");
                 setGameResult(null);
                 setSessionData(null);
                 setQuestions([]);
-                setSelectedSession(null);
+                if (isEmbedded) {
+                  // Reset auto-start guard so the effect fires again
+                  hasAutoStarted.current = false;
+                }
+                setPhase("select");
               }}
               className="w-full py-4 rounded-lg font-bold text-base bg-green-500 hover:bg-green-400 text-black transition-colors"
             >
@@ -878,6 +931,10 @@ export default function BattlePage() {
             </button>
             <button
               onClick={() => {
+                if (onBack) {
+                  onBack();
+                  return;
+                }
                 setPhase("select");
                 setGameResult(null);
                 setSessionData(null);
