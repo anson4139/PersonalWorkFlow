@@ -32,6 +32,7 @@
 
 | 日期       | 提案                       | 對應專案                      | 異動摘要                                                                                                |
 | ---------- | -------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------- |
+| 2026-05-07 | 06-v4-exam-study-platform  | `01-exam-study-platform/`     | V4 v0.5：修正怪獸切換規則——切換觸發改為 HP 歸零事件驅動，`qPerMonster` 僅作傷害量計算，非題目輪換依據   |
 | 2026-05-07 | 06-v4-exam-study-platform  | `01-exam-study-platform/`     | V4 v0.4：怪獸素材就位，20 張 PNG 縮放至 512×512 並存入 `src/web/public/images/monsters/`                |
 | 2026-05-07 | 06-v4-exam-study-platform  | `01-exam-study-platform/`     | V4 v0.3：更新 AI 怪獸圖生成語法，改為透明背景優先，加入各怪獸 Rim Light 色表與 Negative Prompt          |
 | 2026-05-07 | 06-v4-exam-study-platform  | `01-exam-study-platform/`     | V4 v0.2：確認全數 14 項決策；新增動態題數規則、RWD 單畫面設計規格、AI 怪獸圖生成語法、DiceBear 頭像方案 |

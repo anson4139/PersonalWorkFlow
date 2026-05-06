@@ -1,13 +1,12 @@
-import AdminAccess from './pages/AdminAccess'
-import Home from './pages/Home'
+import AdminAccess from "./pages/AdminAccess";
+import BattlePage from "./pages/BattlePage";
 
 function App() {
-  if (window.location.pathname === '/admin/access') {
-    return <AdminAccess />
+  if (window.location.pathname === "/admin/access") {
+    return <AdminAccess />;
   }
 
-  return <Home />
+  return <BattlePage />;
 }
 
-export default App
-
+export default App;

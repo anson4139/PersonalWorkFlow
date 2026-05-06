@@ -1,98 +1,145 @@
-import { useEffect, useState } from 'react'
-import { ALL_SUBJECT_KEYS, PUBLIC_SUBJECT_KEYS, isSubjectKey, type SubjectKey } from '../types'
+import { useEffect, useState } from "react";
+import {
+  ALL_SUBJECT_KEYS,
+  PUBLIC_SUBJECT_KEYS,
+  isSubjectKey,
+  type SubjectKey,
+} from "../types";
 
-const ADMIN_EMAIL = (import.meta.env.VITE_ADMIN_EMAIL ?? import.meta.env.VITE_PRIVILEGED_EMAIL ?? '').trim().toLowerCase()
-const DEV_VIEWER_EMAIL = (import.meta.env.VITE_DEV_VIEWER_EMAIL ?? '').trim().toLowerCase()
-const DEV_ALLOWED_SUBJECTS = (import.meta.env.VITE_DEV_ALLOWED_SUBJECTS ?? '').trim()
-const DEV_IS_ADMIN = (import.meta.env.VITE_DEV_IS_ADMIN ?? '').trim().toLowerCase() === 'true'
+const ADMIN_EMAIL = (
+  import.meta.env.VITE_ADMIN_EMAIL ??
+  import.meta.env.VITE_PRIVILEGED_EMAIL ??
+  ""
+)
+  .trim()
+  .toLowerCase();
+const DEV_VIEWER_EMAIL = (import.meta.env.VITE_DEV_VIEWER_EMAIL ?? "")
+  .trim()
+  .toLowerCase();
+const DEV_ALLOWED_SUBJECTS = (
+  import.meta.env.VITE_DEV_ALLOWED_SUBJECTS ?? ""
+).trim();
+const DEV_IS_ADMIN =
+  (import.meta.env.VITE_DEV_IS_ADMIN ?? "").trim().toLowerCase() === "true";
 
 export interface Viewer {
-  email: string | null
-  isAdmin: boolean
-  allowedSubjects: SubjectKey[]
+  email: string | null;
+  isAdmin: boolean;
+  allowedSubjects: SubjectKey[];
 }
 
 function normalizeEmail(email: string | null | undefined) {
-  const value = email?.trim().toLowerCase()
-  return value ? value : null
+  const value = email?.trim().toLowerCase();
+  return value ? value : null;
 }
 
 function normalizeAllowedSubjects(subjects: string[] | null | undefined) {
   if (!subjects?.length) {
-    return [] as SubjectKey[]
+    return [] as SubjectKey[];
   }
 
-  return Array.from(new Set(subjects.filter(isSubjectKey)))
+  return Array.from(new Set(subjects.filter(isSubjectKey)));
 }
 
 function getDevAllowedSubjects(email: string | null, isAdmin: boolean) {
   if (DEV_ALLOWED_SUBJECTS) {
-    return normalizeAllowedSubjects(DEV_ALLOWED_SUBJECTS.split(',').map(item => item.trim().toLowerCase()))
+    return normalizeAllowedSubjects(
+      DEV_ALLOWED_SUBJECTS.split(",").map((item) => item.trim().toLowerCase()),
+    );
   }
 
   if (isAdmin || (email && ADMIN_EMAIL && email === ADMIN_EMAIL)) {
-    return [...ALL_SUBJECT_KEYS]
+    return [...ALL_SUBJECT_KEYS];
   }
 
-  return [...PUBLIC_SUBJECT_KEYS]
+  return [...PUBLIC_SUBJECT_KEYS];
 }
 
-function createViewer(email: string | null, isAdmin = false, allowedSubjects: SubjectKey[] = [...PUBLIC_SUBJECT_KEYS]): Viewer {
+function createViewer(
+  email: string | null,
+  isAdmin = false,
+  allowedSubjects: SubjectKey[] = [...PUBLIC_SUBJECT_KEYS],
+): Viewer {
   return {
     email,
     isAdmin,
     allowedSubjects,
-  }
+  };
 }
 
 export function useViewer() {
   const [viewer, setViewer] = useState<Viewer>(() => {
-    const email = normalizeEmail(DEV_VIEWER_EMAIL)
-    const isAdmin = DEV_IS_ADMIN || Boolean(email && ADMIN_EMAIL && email === ADMIN_EMAIL)
-    return createViewer(email, isAdmin, getDevAllowedSubjects(email, isAdmin))
-  })
-  const [loading, setLoading] = useState(true)
+    const email = normalizeEmail(DEV_VIEWER_EMAIL);
+    const isAdmin =
+      DEV_IS_ADMIN || Boolean(email && ADMIN_EMAIL && email === ADMIN_EMAIL);
+    return createViewer(email, isAdmin, getDevAllowedSubjects(email, isAdmin));
+  });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let active = true
+    let active = true;
 
     async function loadViewer() {
       try {
-        const response = await fetch('/api/session', { credentials: 'same-origin' })
+        const response = await fetch("/api/session", {
+          credentials: "same-origin",
+        });
         if (!response.ok) {
-          throw new Error('session unavailable')
+          throw new Error("session unavailable");
         }
 
-        const data = (await response.json()) as { email?: string | null; isAdmin?: boolean; allowedSubjects?: string[] }
+        const data = (await response.json()) as {
+          email?: string | null;
+          isAdmin?: boolean;
+          allowedSubjects?: string[];
+        };
         if (!active) {
-          return
+          return;
         }
 
-        const email = normalizeEmail(data.email)
-        const isAdmin = Boolean(data.isAdmin)
-        const allowedSubjects = normalizeAllowedSubjects(data.allowedSubjects)
-        setViewer(createViewer(email, isAdmin, allowedSubjects.length ? allowedSubjects : getDevAllowedSubjects(email, isAdmin)))
+        // If the server returns no email (e.g. local dev without CF Access JWT),
+        // fall back to VITE_DEV_VIEWER_EMAIL so local testing still works.
+        const email =
+          normalizeEmail(data.email) ?? normalizeEmail(DEV_VIEWER_EMAIL);
+        const isAdmin =
+          Boolean(data.isAdmin) ||
+          DEV_IS_ADMIN ||
+          Boolean(email && ADMIN_EMAIL && email === ADMIN_EMAIL);
+        const allowedSubjects = normalizeAllowedSubjects(data.allowedSubjects);
+        setViewer(
+          createViewer(
+            email,
+            isAdmin,
+            allowedSubjects.length
+              ? allowedSubjects
+              : getDevAllowedSubjects(email, isAdmin),
+          ),
+        );
       } catch {
         if (!active) {
-          return
+          return;
         }
 
-        const email = normalizeEmail(DEV_VIEWER_EMAIL)
-        const isAdmin = DEV_IS_ADMIN || Boolean(email && ADMIN_EMAIL && email === ADMIN_EMAIL)
-        setViewer(createViewer(email, isAdmin, getDevAllowedSubjects(email, isAdmin)))
+        const email = normalizeEmail(DEV_VIEWER_EMAIL);
+        const isAdmin =
+          DEV_IS_ADMIN ||
+          Boolean(email && ADMIN_EMAIL && email === ADMIN_EMAIL);
+        setViewer(
+          createViewer(email, isAdmin, getDevAllowedSubjects(email, isAdmin)),
+        );
       } finally {
         if (active) {
-          setLoading(false)
+          setLoading(false);
         }
       }
     }
 
-    void loadViewer()
+    void loadViewer();
 
     return () => {
-      active = false
-    }
-  }, [])
+      active = false;
+    };
+  }, []);
 
-  return { viewer, loading }
+  return { viewer, loading };
 }
