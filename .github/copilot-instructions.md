@@ -108,5 +108,11 @@ After completing any implementation task, you MUST selectively update documentat
     *   A confirmed fact, constraint, or pattern should persist across future sessions.
     *   Only for verified knowledge — not assumptions.
 
+4.  **Proposal & Project Index Sync** — Update BOTH files when a proposal is created or updated:
+    *   **`docs/proposals/<proposal>.md`** → add a row to the **「異動記錄」** table at the top of the document (columns: 日期 / 版本 / 更新人 / 變更說明).
+    *   **`projects/README.md`** → add a row to the **「提案異動歷程」** table (columns: 日期 / 提案 / 對應專案 / 異動摘要).
+    *   These two steps are MANDATORY for every proposal edit. Do NOT skip either file.
+    *   When a proposal has no linked project yet (status = `drafting`), only update the proposal doc; skip `projects/README.md` and note `[DOCS] No project linked yet`.
+
 > If no documentation update is warranted, state explicitly in the Change Summary: `[DOCS] No documentation update required — reason`.
 

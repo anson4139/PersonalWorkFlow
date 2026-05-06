@@ -1,0 +1,21 @@
+{
+  "routes": [
+    {
+      "routePath": "/api/session",
+      "mountPath": "/api",
+      "method": "GET",
+      "module": [
+        "api/session.ts:onRequestGet"
+      ]
+    },
+    {
+      "routePath": "/data/subjects",
+      "mountPath": "/data/subjects",
+      "method": "",
+      "middleware": [
+        "data/subjects/_middleware.ts:onRequest"
+      ]
+    }
+  ],
+  "baseURL": "/"
+}

@@ -1,0 +1,13 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "exam-study-platform",
+	"compatibility_date": "2026-05-03",
+	"pages_build_output_dir": "./dist",
+	"d1_databases": [
+		{
+			"binding": "ACCESS_DB",
+			"database_name": "exam-study-platform-access",
+			"database_id": "a125ac97-63f4-4cbd-8f89-6655dd1accd2"
+		}
+	]
+}

@@ -1,0 +1,312 @@
+{
+  "key": "ecommerce-finance-midterm-113",
+  "title": "113電子商務財務管理(期中考)",
+  "total": 25,
+  "sessions": [
+    {
+      "session": "113期中考",
+      "questions": [
+        {
+          "no": 1,
+          "question": "If you invest $500 today, what is the future value you will earn in twenty years? Assume the interest rate is 8%.",
+          "options": {
+            "A": "734.66.",
+            "B": "1680.24.",
+            "C": "2,480.32.",
+            "D": "2,330.48."
+          },
+          "answer": "D",
+          "explanation": "公式：\nFV = PV(1+r)^n\n代入：\nFV = 500(1+0.08)^{20}\nFV = 500(1.08)^{20} = 2,330.48"
+        },
+        {
+          "no": 2,
+          "question": "If you invest $500 today, what is the interest on interest (利息的利息) you will earn in twenty years? Assume the interest rate is 8%.",
+          "options": {
+            "A": "680.24.",
+            "B": "1,030.48.",
+            "C": "1480.32.",
+            "D": "225.47."
+          },
+          "answer": "B",
+          "explanation": "第 1 題的未來值：\nFV = 2,330.48\n總利息：\n2,330.48 - 500 = 1,830.48\n單利利息：\n500 \\times 8\\% \\times 20 = 800\n利息的利息：\n1,830.48 - 800 = 1,030.48"
+        },
+        {
+          "no": 3,
+          "question": "If you are saving up (存錢) to buy a house for $8,000,000, and you have $1,000,000 today. The rate of return (報酬率, 機會成本) on your money is 6%. How long will you have to wait (必須等多久)?",
+          "options": {
+            "A": "35.69.",
+            "B": "116.67.",
+            "C": "13.33.",
+            "D": "11.11."
+          },
+          "answer": "A",
+          "explanation": "公式：\nFV = PV(1+r)^n\n代入：\n8,000,000 = 1,000,000(1.06)^n\n8 = (1.06)^n\n取自然對數：\nn = \\frac{\\ln 8}{\\ln 1.06}\nn = 35.69"
+        },
+        {
+          "no": 4,
+          "question": "If an investment promises to double your money in 10 years (此項投資保證你可以在10年內將原始投資金額變成兩倍), what is the approximate rate of return on the investment?",
+          "options": {
+            "A": "13.89%.",
+            "B": "7.18%.",
+            "C": "8.02%.",
+            "D": "20%."
+          },
+          "answer": "B",
+          "explanation": "公式：\n2 = (1+r)^{10}\nr = 2^{1/10} - 1\nr = 0.0718 = 7.18\\%"
+        },
+        {
+          "no": 5,
+          "question": "What is the present value of the investment that promised to pay $600 at the end of each year and the cash flow continues forever (每年$600持續到永久)? Assume that the interest rate is 7%.",
+          "options": {
+            "A": "4,200.",
+            "B": "11,666.67.",
+            "C": "8,571.43.",
+            "D": "12,000."
+          },
+          "answer": "C",
+          "explanation": "永續年金公式：\nPV = \\frac{C}{r}\n代入：\nPV = \\frac{600}{0.07}\nPV = 8,571.43"
+        },
+        {
+          "no": 6,
+          "question": "Suppose we were examining (檢視) an asset that promised to pay $600 at the end of each of the next five years. If we offer $2200 for this annuity today (這項年金投資今天必須花費$2200), what is the implicit (隱含) interest rate?",
+          "options": {
+            "A": "3.67%.",
+            "B": "11.32%.",
+            "C": "27.27%.",
+            "D": "36.36%."
+          },
+          "answer": "B",
+          "explanation": "題目給：\nPV = 2,200\nC = 600\nn = 5\n年金現值公式：\nPV = C \\times \\frac{1-(1+r)^{-n}}{r}\n代入：\n2,200 = 600 \\times \\frac{1-(1+r)^{-5}}{r}\n解出：\nr \\approx 11.32\\%"
+        },
+        {
+          "no": 7,
+          "question": "Suppose you are considering buying (考慮購買) a bond with 10 years to maturity. The coupon rate (票面利率) of the bond is 8%, and the principal (本金) is $1,000. It sells for $900 (今天要付$900購買). What is the yield to maturity of this bond?",
+          "options": {
+            "A": "1.06%.",
+            "B": "9.60%",
+            "C": "8%.",
+            "D": "9%."
+          },
+          "answer": "B",
+          "explanation": "債券價格公式：\nP = C \\times \\frac{1-(1+y)^{-n}}{y} + \\frac{F}{(1+y)^n}\n題目給：\nP = 900\nC = 1,000 \\times 8\\% = 80\nF = 1,000\nn = 10\n代入：\n900 = 80 \\times \\frac{1-(1+y)^{-10}}{y} + \\frac{1,000}{(1+y)^{10}}\n解出：\ny \\approx 9.60\\%"
+        },
+        {
+          "no": 8,
+          "question": "Suppose you are considering buying a bond with 10 years to maturity. The coupon rate of the bond is 8%, and the principal is $1,000. The yield to maturity of a similar bond is 9%. How much do you want to pay for this 8% coupon rate bond?",
+          "options": {
+            "A": "935.82",
+            "B": "422.41",
+            "C": "473.75.",
+            "D": "1067.10."
+          },
+          "answer": "A",
+          "explanation": "公式：\nP = C \\times \\frac{1-(1+y)^{-n}}{y} + \\frac{F}{(1+y)^n}\n代入：\nC = 80\ny = 9\\%\nn = 10\nF = 1,000\nP = 80 \\times \\frac{1-(1.09)^{-10}}{0.09} + \\frac{1,000}{(1.09)^{10}}\nP = 935.82"
+        },
+        {
+          "no": 9,
+          "question": "Which of the following investments offers the highest annualized rate of return? (Comparing the rate)",
+          "options": {
+            "A": "You invest $400 today at 10% compoundingly.",
+            "B": "You will get $580 in two years if you invest $500 today.",
+            "C": "You will get $1000 in three years if you invest $800 today.",
+            "D": "You will get $850 in three years if you invest $600."
+          },
+          "answer": "D",
+          "explanation": "a：\nr = 10\\%\nb：\nr = \\left(\\frac{580}{500}\\right)^{1/2}-1\nr = 7.70\\%\nc：\nr = \\left(\\frac{1000}{800}\\right)^{1/3}-1\nr = 7.72\\%\nd：\nr = \\left(\\frac{850}{600}\\right)^{1/3}-1\nr = 12.31\\%\n最高的是 d。"
+        },
+        {
+          "no": 10,
+          "question": "You are considering the purchase of a bond with a par value of $1,000 and a coupon rate of 8%. The bond is currently priced at $1,100. Which of the following statements is true about the relationship between the bond’s price and its yield to maturity?",
+          "options": {
+            "A": "The bond’s YTM is equal to the coupon rate.",
+            "B": "The bond’s YTM is higher than 8%.",
+            "C": "The bond’s YTM is lower than 8%.",
+            "D": "The bond’s YTM is higher than the coupon rate because it is priced at a premium."
+          },
+          "answer": "C",
+          "explanation": "債券面額：\n1,000\n目前價格：\n1,100\n票面利率：\n8\\%\n當債券價格高於面額，稱為 premium bond。\nPremium bond 的特性：\nYTM < Coupon\\ Rate\n所以：\nYTM < 8\\%"
+        },
+        {
+          "no": 11,
+          "question": "Which of the following statements about the time value of money is incorrect?",
+          "options": {
+            "A": "A dollar in hand today is worth more than a dollar promised at some time in the future.",
+            "B": "The trade-off between money now and money later depends on the rate you can earn by investing.",
+            "C": "Future value is the cash value of an investment at some time in the future.",
+            "D": "For a given time period, the lower the interest rate, the larger the future value."
+          },
+          "answer": "D",
+          "explanation": "錯在 d。\n未來值公式：\nFV = PV(1+r)^n\n利率越高，未來值越大。\n所以正確觀念應該是：\nhigher\\ interest\\ rate \\Rightarrow larger\\ future\\ value"
+        },
+        {
+          "no": 12,
+          "question": "Which of the following is not the essence of capital budgeting?",
+          "options": {
+            "A": "Size of future cash flows.",
+            "B": "Timing of future cash flows.",
+            "C": "How to raise capital.",
+            "D": "Risk of future cash flows."
+          },
+          "answer": "C",
+          "explanation": "資本預算主要評估投資專案是否值得做，核心包含：\n- 現金流大小\n- 現金流時間\n- 現金流風險\n「如何籌資」屬於融資決策，不是資本預算的核心。"
+        },
+        {
+          "no": 13,
+          "question": "Which bond suffers from greater interest rate risk?",
+          "options": {
+            "A": "bonds with a lower coupon rate.",
+            "B": "bonds with a higher coupon rate.",
+            "C": "bonds with a shorter maturity.",
+            "D": "bonds with a smaller principal."
+          },
+          "answer": "A",
+          "explanation": "利率風險較高的債券通常具有：\n- 低票面利率\n- 長到期期間\n因為低票息債券的現金流較集中在未來本金償還，對折現率變動更敏感。"
+        },
+        {
+          "no": 14,
+          "question": "What is the main cause of the agency problem?",
+          "options": {
+            "A": "The ownership of a corporation can be readily transferred.",
+            "B": "the shareholders in a corporation have limited liability for debts.",
+            "C": "the financial manager attempts to maximize the market value of the existing stock.",
+            "D": "the dispersion of ownership for a corporation."
+          },
+          "answer": "D",
+          "explanation": "代理問題來自於：\n所有權與經營權分離\n當股東眾多且分散時，經理人可能追求自身利益，而不一定完全追求股東利益最大化。"
+        },
+        {
+          "no": 15,
+          "question": "Why is the ability of sole proprietorships and partnerships to grow often limited?",
+          "options": {
+            "A": "the owners have unlimited liabilities.",
+            "B": "the ownership can be transferred.",
+            "C": "the stockholders can elect the board of directors.",
+            "D": "The managers control the corporation."
+          },
+          "answer": "A",
+          "explanation": "獨資與合夥企業的問題：\n業主負無限責任\n因此籌資能力有限，企業規模成長容易受限制。"
+        },
+        {
+          "no": 16,
+          "question": "Which of the following statements about loan types is correct?",
+          "options": {
+            "A": "In a pure discount loan, the borrower pays equal total payments every period.",
+            "B": "In an interest-only loan, the borrower repays (償付) part of the principal (本金) every period.",
+            "C": "In an amortized loan with fixed payments, the interest portion declines over time and the principal portion rises over time.",
+            "D": "In an amortized loan, the ending loan balance (餘額) always stays the same."
+          },
+          "answer": "C",
+          "explanation": "固定本息攤還貸款中，每期總付款固定。\n一開始本金餘額高，因此利息占比高。\n隨著本金逐漸償還：\n利息部分下降\n本金部分上升\n所以 c 正確。"
+        },
+        {
+          "no": 17,
+          "question": "Two banks offer different interest rates on savings accounts. Bank A offers an interest rate of 6% compounded quarterly, while Bank B offers an interest rate of 5.9% compounded monthly. Which bank provides the higher Effective Annual Rate (EAR)?",
+          "options": {
+            "A": "Bank A.",
+            "B": "Bank B.",
+            "C": "Both banks provide the same EAR.",
+            "D": "It depends on the principal amount invested."
+          },
+          "answer": "A",
+          "explanation": "EAR 公式：\nEAR = \\left(1+\\frac{APR}{m}\\right)^m - 1\nBank A：\nEAR_A = \\left(1+\\frac{0.06}{4}\\right)^4 - 1\nEAR_A = 6.136\\%\nBank B：\nEAR_B = \\left(1+\\frac{0.059}{12}\\right)^{12} - 1\nEAR_B = 6.062\\%\n所以 Bank A 較高。"
+        },
+        {
+          "no": 18,
+          "question": "You are taking out a loan of $10,000 with an annual interest rate of 6%, to be paid back over 5 years with annual payments. What is the annual payment amount for this amortized loan?",
+          "options": {
+            "A": "$2,365.47.",
+            "B": "$2500.00.",
+            "C": "$2,373.96.",
+            "D": "$2426.73."
+          },
+          "answer": "C",
+          "explanation": "年金付款公式：\nPMT = \\frac{PV \\times r}{1-(1+r)^{-n}}\n代入：\nPV = 10,000\nr = 6\\%\nn = 5\nPMT = \\frac{10,000 \\times 0.06}{1-(1.06)^{-5}}\nPMT = 2,373.96"
+        },
+        {
+          "no": 19,
+          "question": "If you borrow NT$2,500,000 as a personal loan and agree to repay it in 120 equal monthly payments. The annual interest rate is 6%, compounded monthly. How much should you pay each month?",
+          "options": {
+            "A": "NT$25,000.00",
+            "B": "NT$27,755.13",
+            "C": "NT$30,000.00",
+            "D": "NT$32,418.50."
+          },
+          "answer": "B",
+          "explanation": "月利率：\nr = \\frac{6\\%}{12} = 0.5\\%\n期數：\nn = 120\n公式：\nPMT = \\frac{PV \\times r}{1-(1+r)^{-n}}\n代入：\nPMT = \\frac{2,500,000 \\times 0.005}{1-(1.005)^{-120}}\nPMT = 27,755.13"
+        },
+        {
+          "no": 20,
+          "question": "Which of the following statements is correct?",
+          "options": {
+            "A": "A callable (可贖回) bond gives the bondholder (債券持有者) the right to force the issuer to repurchase the bond at a stated (預先談好的履約價) price.",
+            "B": "A putable (可賣回) bond gives the issuer the right to retire the bond before maturity at a stated price.",
+            "C": "A putable bond allows the holder to force the issuer to buy the bond back at a stated price.",
+            "D": "A callable bond and a putable bond give the same right to the issuer."
+          },
+          "answer": "C",
+          "explanation": "Callable bond：\n發行人有權提前贖回債券\nPutable bond：\n債券持有人有權要求發行人買回債券\n所以 c 正確。"
+        },
+        {
+          "no": 21,
+          "question": "If interest rates fall significantly, the issuer is more likely to exercise (履約) the feature on a:",
+          "options": {
+            "A": "putable bond.",
+            "B": "callable bond.",
+            "C": "discount bond.",
+            "D": "bond with a lower coupon rate."
+          },
+          "answer": "B",
+          "explanation": "當市場利率下降，發行人可以用較低利率重新發債。\n所以發行人會傾向贖回舊的高利率債券。\n這是 callable bond 的特性。"
+        },
+        {
+          "no": 22,
+          "question": "Suppose you expect a stock price to increase in the future. Which of the following is generally more attractive?",
+          "options": {
+            "A": "Buy a put option.",
+            "B": "Buy a call option.",
+            "C": "Sell a call option.",
+            "D": "Sell the stock short."
+          },
+          "answer": "B",
+          "explanation": "買權 call option 給持有人：\n未來以履約價買進股票的權利\n如果預期股價上漲，買 call 可以受益。"
+        },
+        {
+          "no": 23,
+          "question": "Which of the following statements is correct?",
+          "options": {
+            "A": "An increase in stock price volatility will decrease the value of both call options and put options.",
+            "B": "An increase in stock price volatility will increase the value of call options but decrease the value of put options.",
+            "C": "An increase in stock price volatility will increase the value of both call options and put options.",
+            "D": "Stock price volatility has no effect on option values."
+          },
+          "answer": "C",
+          "explanation": "選擇權的損失有限，獲利潛力因波動度提高而增加。\n因此波動度上升通常會使：\nCall\\ option\\ value\\ 上升\nPut\\ option\\ value\\ 上升"
+        },
+        {
+          "no": 24,
+          "question": "Suppose the loan amount and the number of payments stay the same. If the interest rate increases, the monthly payment on an amortized loan will:",
+          "options": {
+            "A": "decrease.",
+            "B": "increase.",
+            "C": "stay the same.",
+            "D": "become zero."
+          },
+          "answer": "B",
+          "explanation": "攤還貸款公式：\nPMT = \\frac{PV \\times r}{1-(1+r)^{-n}}\n當：\nPV\\ 不變\nn\\ 不變\nr\\ 上升\n則：\nPMT\\ 上升"
+        },
+        {
+          "no": 25,
+          "question": "The primary goal of financial management in a corporation is to:",
+          "options": {
+            "A": "maximize dividends paid to shareholders.",
+            "B": "maximize the current value per share of existing stock.",
+            "C": "maximize market share.",
+            "D": "minimize operating costs"
+          },
+          "answer": "B",
+          "explanation": "公司財務管理的主要目標是：\n最大化現有股東每股股票的目前價值\n也就是：\nmaximize\\ shareholder\\ wealth\n不是單純最大化股利、市占率或最小化成本。"
+        }
+      ]
+    }
+  ]
+}

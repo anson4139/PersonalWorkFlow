@@ -14,6 +14,10 @@
 .claude/skills/pptx/
 .claude/skills/xlsx/
 
+# Raw source materials (large binary files — do not commit)
+projects/**/data/raw-pdfs/
+MonsterImage/
+
 # Security: Environment Variables
 .env
 .env.local
