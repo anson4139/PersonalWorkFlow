@@ -275,11 +275,23 @@ export default function BattlePage({
     setApiError(null);
     try {
       const shuffled = shuffleArray(sessionObj.questions);
-      const sd = await startSession(
-        selectedKey,
-        selectedSession,
-        shuffled.length,
-      );
+      let sd: SessionData;
+      try {
+        sd = await startSession(selectedKey, selectedSession, shuffled.length);
+      } catch {
+        // API 不可用時改用 local fallback，不阻斷遊戲
+        const total = shuffled.length;
+        const qPerMonster = Math.max(1, Math.ceil(total / 10));
+        sd = {
+          sessionId: -1,
+          monsterOrder: shuffleArray(
+            Array.from({ length: 10 }, (_, i) => i + 1),
+          ),
+          totalQuestions: total,
+          qPerMonster,
+          maxWrong: Math.max(1, Math.floor(total * 0.3)),
+        };
+      }
       setSessionData(sd);
       setQuestions(shuffled);
       setCurrentIndex(0);
@@ -293,7 +305,7 @@ export default function BattlePage({
       setShowExplanation(false);
       setPhase("battle");
     } catch {
-      setApiError("無法開始遊戲，請確認網路連線");
+      setApiError("資料載入失敗，請重試");
       setPhase("select");
     }
   };
@@ -442,6 +454,21 @@ export default function BattlePage({
 
   // Embedded mode: skip select UI, show loading while auto-starting
   if (isEmbedded && (phase === "select" || phase === "loading")) {
+    if (apiError && phase === "select") {
+      return (
+        <div className="h-dvh bg-black flex flex-col items-center justify-center gap-4">
+          <p className="text-red-400 text-sm">{apiError}</p>
+          {onBack && (
+            <button
+              onClick={onBack}
+              className="text-xs text-green-400 hover:text-white transition"
+            >
+              ← 返回
+            </button>
+          )}
+        </div>
+      );
+    }
     return (
       <div className="h-dvh bg-black flex items-center justify-center text-green-400 text-sm">
         準備對戰…
@@ -745,9 +772,44 @@ export default function BattlePage({
 
           {/* ── D: Question Zone ──────────────────────── */}
           <div className="flex-[4] min-h-0 overflow-y-auto flex flex-col px-4 py-3">
-            <p className="text-sm text-gray-200 mb-4 leading-relaxed flex-none">
+            <p className="text-sm text-gray-200 mb-3 leading-relaxed flex-none">
               {question.question}
             </p>
+
+            {/* 程式碼區塊 */}
+            {question.code_block && (
+              <div className="mb-3 overflow-x-auto rounded-lg border border-[#2a2a2a] bg-[#0d0d0d] flex-none">
+                <pre className="p-3 text-xs leading-relaxed text-green-300 whitespace-pre">
+                  <code>{question.code_block}</code>
+                </pre>
+              </div>
+            )}
+
+            {/* 題目圖片 */}
+            {question.image_url && (
+              <div className="mb-3 flex-none">
+                <img
+                  src={question.image_url}
+                  alt={`第 ${question.no} 題圖片`}
+                  loading="lazy"
+                  className="max-w-full rounded-lg border border-[#2a2a2a]"
+                  onError={(e) => {
+                    const t = e.currentTarget;
+                    t.style.display = "none";
+                    const ph = t.nextElementSibling as HTMLElement | null;
+                    if (ph) ph.style.display = "flex";
+                  }}
+                />
+                <div
+                  style={{ display: "none" }}
+                  className="items-center gap-2 rounded-lg border border-dashed border-[#3a3a3a] bg-[#0d0d0d] px-3 py-2 text-xs text-gray-500"
+                >
+                  <span className="text-yellow-500">⚠</span>
+                  本題含附圖，圖片尚未上傳，請參考原始試題
+                </div>
+              </div>
+            )}
+
             <div className="flex flex-col gap-2 flex-none">
               {optionLabels.map((label) => (
                 <button

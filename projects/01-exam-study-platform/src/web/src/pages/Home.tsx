@@ -3,10 +3,16 @@ import QuestionCard from "../components/QuestionCard";
 import { useSubject } from "../hooks/useSubject";
 import { useViewer } from "../hooks/useViewer";
 import type { SubjectKey } from "../types";
-import { EXAM_GROUPS, SUBJECTS } from "../types";
+import { EXAM_GROUPS, PARENT_GROUPS, SUBJECTS } from "../types";
 import BattlePage from "./BattlePage";
 
-type Mode = "home" | "subject-select" | "session-select" | "quiz";
+type Mode =
+  | "home"
+  | "level-select"
+  | "sub-category-select"
+  | "subject-select"
+  | "session-select"
+  | "quiz";
 type QuizView = "single" | "batch" | "battle";
 
 const BATCH_SIZE = 10;
@@ -16,6 +22,10 @@ export default function Home() {
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
   const [selectedKey, setSelectedKey] = useState<SubjectKey | null>(null);
   const [selectedSession, setSelectedSession] = useState<string | null>(null);
+  const [selectedParent, setSelectedParent] = useState<string | null>(null);
+  const [selectedSubCategory, setSelectedSubCategory] = useState<string | null>(
+    null,
+  );
   const [mode, setMode] = useState<Mode>("home");
   const [quizView, setQuizView] = useState<QuizView>("single");
   const [page, setPage] = useState(0);
@@ -30,10 +40,58 @@ export default function Home() {
   );
   const selectedGroupData =
     visibleGroups.find((group) => group.key === selectedGroup) ?? null;
-  const visibleSubjects = SUBJECTS.filter(
-    (subject) =>
-      subject.groupKey === selectedGroup && allowedSubjectSet.has(subject.key),
-  );
+  const visibleSubjects = SUBJECTS.filter((subject) => {
+    if (subject.groupKey !== selectedGroup) return false;
+    if (!allowedSubjectSet.has(subject.key)) return false;
+    if (selectedSubCategory) {
+      const group = EXAM_GROUPS.find((g) => g.key === selectedGroup);
+      const subCat = group?.subCategories?.find(
+        (sc) => sc.key === selectedSubCategory,
+      );
+      if (subCat) return subCat.subjectKeys.includes(subject.key);
+    }
+    return true;
+  });
+  // 首頁顯示項目：同屬 parent group 的合併為一個入口
+  const addedParentKeys = new Set<string>();
+  const homeItems: {
+    type: "group" | "parent";
+    key: string;
+    title: string;
+    count: number;
+  }[] = [];
+  for (const group of visibleGroups) {
+    const parent = PARENT_GROUPS.find((p) =>
+      (p.groupKeys as string[]).includes(group.key),
+    );
+    if (parent) {
+      if (!addedParentKeys.has(parent.key)) {
+        addedParentKeys.add(parent.key);
+        const count = parent.groupKeys.reduce((acc, gk) => {
+          const g = EXAM_GROUPS.find((eg) => eg.key === gk);
+          return (
+            acc +
+            (g?.subjectKeys.filter((sk) => allowedSubjectSet.has(sk)).length ??
+              0)
+          );
+        }, 0);
+        homeItems.push({
+          type: "parent",
+          key: parent.key,
+          title: parent.title,
+          count,
+        });
+      }
+    } else {
+      homeItems.push({
+        type: "group",
+        key: group.key,
+        title: group.title,
+        count: group.subjectKeys.filter((sk) => allowedSubjectSet.has(sk))
+          .length,
+      });
+    }
+  }
   const selectedSubjectLabel = SUBJECTS.find(
     (subject) => subject.key === selectedKey,
   )?.label;
@@ -76,7 +134,67 @@ export default function Home() {
           </p>
         </div>
         <div className="space-y-3">
-          {visibleGroups.map((group) => (
+          {homeItems.map((item) => (
+            <button
+              key={item.key}
+              onClick={() => {
+                if (item.type === "parent") {
+                  setSelectedParent(item.key);
+                  setSelectedGroup(null);
+                  setSelectedKey(null);
+                  setSelectedSession(null);
+                  setSelectedSubCategory(null);
+                  setMode("level-select");
+                } else {
+                  setSelectedParent(null);
+                  setSelectedGroup(item.key);
+                  setSelectedKey(null);
+                  setSelectedSession(null);
+                  setSelectedSubCategory(null);
+                  const group = EXAM_GROUPS.find((g) => g.key === item.key);
+                  setMode(
+                    group?.subCategories?.length
+                      ? "sub-category-select"
+                      : "subject-select",
+                  );
+                }
+              }}
+              className="w-full rounded-xl border border-[#1f1f1f] bg-[#111] px-6 py-4 text-left text-base
+                         font-medium text-gray-200 transition hover:border-[#76b900] hover:text-[#76b900]"
+            >
+              <div>{item.title}</div>
+              <div className="mt-1 text-xs text-gray-500">
+                {item.count} 個科目
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (mode === "level-select") {
+    const parentData = PARENT_GROUPS.find((p) => p.key === selectedParent);
+    const parentGroupKeySet = new Set(parentData?.groupKeys ?? []);
+    const levelGroups = EXAM_GROUPS.filter(
+      (g) =>
+        parentGroupKeySet.has(g.key) &&
+        g.subjectKeys.some((sk) => allowedSubjectSet.has(sk)),
+    );
+    return (
+      <div className="mx-auto max-w-lg px-4 py-10">
+        <button
+          onClick={() => setMode("home")}
+          className="mb-6 text-sm text-[#76b900] hover:text-white transition"
+        >
+          ← 返回
+        </button>
+        <h2 className="mb-2 text-xl font-black text-white">
+          {parentData?.title}
+        </h2>
+        <p className="mb-6 text-sm text-gray-500">選擇等級</p>
+        <div className="space-y-3">
+          {levelGroups.map((group) => (
             <button
               key={group.key}
               onClick={() => {
@@ -91,9 +209,8 @@ export default function Home() {
               <div>{group.title}</div>
               <div className="mt-1 text-xs text-gray-500">
                 {
-                  group.subjectKeys.filter((subjectKey) =>
-                    allowedSubjectSet.has(subjectKey),
-                  ).length
+                  group.subjectKeys.filter((sk) => allowedSubjectSet.has(sk))
+                    .length
                 }{" "}
                 個科目
               </div>
@@ -104,7 +221,9 @@ export default function Home() {
     );
   }
 
-  if (mode === "subject-select") {
+  if (mode === "sub-category-select") {
+    const currentGroup = EXAM_GROUPS.find((g) => g.key === selectedGroup);
+    const subCats = currentGroup?.subCategories ?? [];
     return (
       <div className="mx-auto max-w-lg px-4 py-10">
         <button
@@ -114,7 +233,60 @@ export default function Home() {
           ← 返回
         </button>
         <h2 className="mb-2 text-xl font-black text-white">
-          {selectedGroupData?.title}
+          {currentGroup?.title}
+        </h2>
+        <p className="mb-6 text-sm text-gray-500">選擇科目類別</p>
+        <div className="space-y-3">
+          {subCats.map((sc) => (
+            <button
+              key={sc.key}
+              onClick={() => {
+                setSelectedSubCategory(sc.key);
+                setMode("subject-select");
+              }}
+              className="w-full rounded-xl border border-[#1f1f1f] bg-[#111] px-6 py-4 text-left text-base
+                         font-medium text-gray-200 transition hover:border-[#76b900] hover:text-[#76b900]"
+            >
+              <div>{sc.title}</div>
+              <div className="mt-1 text-xs text-gray-500">
+                {
+                  sc.subjectKeys.filter((sk) => allowedSubjectSet.has(sk))
+                    .length
+                }{" "}
+                個年度
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (mode === "subject-select") {
+    const backMode = selectedSubCategory
+      ? "sub-category-select"
+      : selectedParent
+        ? "level-select"
+        : "home";
+    const subCatTitle = selectedSubCategory
+      ? EXAM_GROUPS.find((g) => g.key === selectedGroup)?.subCategories?.find(
+          (sc) => sc.key === selectedSubCategory,
+        )?.title
+      : null;
+    return (
+      <div className="mx-auto max-w-lg px-4 py-10">
+        <button
+          onClick={() => setMode(backMode)}
+          className="mb-6 text-sm text-[#76b900] hover:text-white transition"
+        >
+          ← 返回
+        </button>
+        <h2 className="mb-2 text-xl font-black text-white">
+          {selectedParent
+            ? `${PARENT_GROUPS.find((p) => p.key === selectedParent)?.title}（${selectedGroupData?.title}）`
+            : subCatTitle
+              ? `${selectedGroupData?.title}（${subCatTitle}）`
+              : selectedGroupData?.title}
         </h2>
         <p className="mb-6 text-sm text-gray-500">選擇科目</p>
         <div className="space-y-3">
