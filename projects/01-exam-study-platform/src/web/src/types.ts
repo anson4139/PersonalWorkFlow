@@ -55,10 +55,17 @@ export interface SubjectMeta {
   groupKey: ExamGroupKey;
 }
 
+export interface SubCategory {
+  key: string;
+  title: string;
+  subjectKeys: SubjectKey[];
+}
+
 export interface ExamGroup {
   key: ExamGroupKey;
   title: string;
   subjectKeys: SubjectKey[];
+  subCategories?: SubCategory[];
 }
 
 export interface ParentGroup {
@@ -171,6 +178,32 @@ export const EXAM_GROUPS: ExamGroup[] = [
       "securities-broker-finance-111",
       "securities-broker-finance-110",
     ],
+    subCategories: [
+      {
+        key: "law",
+        title: "法規與實務",
+        subjectKeys: [
+          "securities-broker-law-115",
+          "securities-broker-law-114",
+          "securities-broker-law-113",
+          "securities-broker-law-112",
+          "securities-broker-law-111",
+          "securities-broker-law-110",
+        ],
+      },
+      {
+        key: "finance",
+        title: "投資與財務分析",
+        subjectKeys: [
+          "securities-broker-finance-115",
+          "securities-broker-finance-114",
+          "securities-broker-finance-113",
+          "securities-broker-finance-112",
+          "securities-broker-finance-111",
+          "securities-broker-finance-110",
+        ],
+      },
+    ],
   },
   {
     key: "fintech-exam",
@@ -178,14 +211,14 @@ export const EXAM_GROUPS: ExamGroup[] = [
     subjectKeys: ["fintech"],
   },
   {
-    key: "ai-planner-mid",
-    title: "中級",
-    subjectKeys: ["ai-planning", "big-data", "machine-learning"],
-  },
-  {
     key: "ai-planner-basic",
     title: "初級",
     subjectKeys: ["ai-planning-basic", "gen-ai-basic"],
+  },
+  {
+    key: "ai-planner-mid",
+    title: "中級",
+    subjectKeys: ["ai-planning", "big-data", "machine-learning"],
   },
   {
     key: "ecommerce-course",
@@ -209,6 +242,18 @@ export const PUBLIC_SUBJECT_KEYS: SubjectKey[] = [
   "ecommerce-finance-midterm-113",
   "ai-planning-basic",
   "gen-ai-basic",
+  "securities-broker-law-110",
+  "securities-broker-law-111",
+  "securities-broker-law-112",
+  "securities-broker-law-113",
+  "securities-broker-law-114",
+  "securities-broker-law-115",
+  "securities-broker-finance-110",
+  "securities-broker-finance-111",
+  "securities-broker-finance-112",
+  "securities-broker-finance-113",
+  "securities-broker-finance-114",
+  "securities-broker-finance-115",
 ];
 
 export function isSubjectKey(value: string): value is SubjectKey {

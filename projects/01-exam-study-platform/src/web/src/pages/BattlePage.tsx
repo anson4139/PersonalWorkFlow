@@ -284,7 +284,9 @@ export default function BattlePage({
         const qPerMonster = Math.max(1, Math.ceil(total / 10));
         sd = {
           sessionId: -1,
-          monsterOrder: Array.from({ length: 10 }, (_, i) => (i % 10) + 1),
+          monsterOrder: shuffleArray(
+            Array.from({ length: 10 }, (_, i) => i + 1),
+          ),
           totalQuestions: total,
           qPerMonster,
           maxWrong: Math.max(1, Math.floor(total * 0.3)),
