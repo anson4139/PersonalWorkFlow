@@ -24,6 +24,7 @@
 | [05_01_question-bank.md](../docs/proposals/03-closed/05_01_question-bank.md)                       | closed | `01-exam-study-platform/`     |
 | [06_01_monster-battle.md](../docs/proposals/03-closed/06_01_monster-battle.md)                     | closed | `01-exam-study-platform/`     |
 | [07_02_resume-thesis-pdf-viewer.md](../docs/proposals/03-closed/07_02_resume-thesis-pdf-viewer.md) | closed | `02-personal-resume-website/` |
+| [09_01_midlevel-fix-basic-bank.md](../docs/proposals/02-active/09_01_midlevel-fix-basic-bank.md)   | active | `01-exam-study-platform/`     |
 | [08_02_resume-104-sync.md](../docs/proposals/03-closed/08_02_resume-104-sync.md)                   | closed | `02-personal-resume-website/` |
 
 ---
@@ -34,6 +35,9 @@
 
 | 日期       | 提案                           | 對應專案                      | 異動摘要                                                                                                                                          |
 | ---------- | ------------------------------ | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-05-08 | 09_01_midlevel-fix-basic-bank  | `01-exam-study-platform/`     | **結案**：中/初級共 250 題解析補齊、含圖題渲染（code_block/image_url）、KaTeX 數學符號、前端接入初級科目、production 部署正常                     |
+| 2026-05-08 | 09_01_midlevel-fix-basic-bank  | `01-exam-study-platform/`     | v0.2：補入含圖題方案A+C（圖片提取+code_block欄位）與KaTeX數學符號渲染、JSON Schema擴充                                                            |
+| 2026-05-08 | 09_01_midlevel-fix-basic-bank  | `01-exam-study-platform/`     | 提案建立：中級三科 150 題修正（截斷/殘留字元/補解析）+ 初級兩科四梯次 PDF 轉換建立 + 前端接入                                                     |
 | 2026-05-07 | 08_02_resume-104-sync          | `02-personal-resume-website/` | 實作完成：修正職稱（2項）、新增翔騰/明台/皇將經歷、補僑光學歷、TIPCI認證、前端技能，提案結案                                                      |
 | 2026-05-07 | 08_02_resume-104-sync          | `02-personal-resume-website/` | 提案建立：104 資料同步更新——補齊 3 段工作經歷、修正職稱錯誤、補充僑光學歷與 TIPCI 證照，含 13 份截圖 OCR 參考資料                                 |
 | 2026-05-07 | 07_02_resume-thesis-pdf-viewer | `02-personal-resume-website/` | 提案建立：在履歷網站論文專案卡片加入 PDF 展示功能（Lightbox Viewer / 下載），三方案供選擇                                                         |
