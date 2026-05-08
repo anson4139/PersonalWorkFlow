@@ -24,9 +24,8 @@
 | [05_01_question-bank.md](../docs/proposals/03-closed/05_01_question-bank.md)                       | closed | `01-exam-study-platform/`     |
 | [06_01_monster-battle.md](../docs/proposals/03-closed/06_01_monster-battle.md)                     | closed | `01-exam-study-platform/`     |
 | [07_02_resume-thesis-pdf-viewer.md](../docs/proposals/03-closed/07_02_resume-thesis-pdf-viewer.md) | closed | `02-personal-resume-website/` |
-| [09_01_midlevel-fix-basic-bank.md](../docs/proposals/03-closed/09_01_midlevel-fix-basic-bank.md)   | closed | `01-exam-study-platform/`     |
+| [09_01_midlevel-fix-basic-bank.md](../docs/proposals/02-active/09_01_midlevel-fix-basic-bank.md)   | active | `01-exam-study-platform/`     |
 | [08_02_resume-104-sync.md](../docs/proposals/03-closed/08_02_resume-104-sync.md)                   | closed | `02-personal-resume-website/` |
-| [10_01_battle-v2-advanced.md](../docs/proposals/02-active/10_01_battle-v2-advanced.md)             | active | `01-exam-study-platform/`     |
 
 ---
 
@@ -36,7 +35,6 @@
 
 | 日期       | 提案                           | 對應專案                      | 異動摘要                                                                                                                                          |
 | ---------- | ------------------------------ | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-05-08 | 10_01_battle-v2-advanced       | `01-exam-study-platform/`     | 提案建立：對戰模式 v6 全面升級——25 隻怪獸（10普通/10強化/5Boss）、世界觀劇情、11 項玩法優化、分數公式、localStorage schema、30 張新圖 Prompt      |
 | 2026-05-08 | 09_01_midlevel-fix-basic-bank  | `01-exam-study-platform/`     | **結案**：中/初級共 250 題解析補齊、含圖題渲染（code_block/image_url）、KaTeX 數學符號、前端接入初級科目、production 部署正常                     |
 | 2026-05-08 | 09_01_midlevel-fix-basic-bank  | `01-exam-study-platform/`     | v0.2：補入含圖題方案A+C（圖片提取+code_block欄位）與KaTeX數學符號渲染、JSON Schema擴充                                                            |
 | 2026-05-08 | 09_01_midlevel-fix-basic-bank  | `01-exam-study-platform/`     | 提案建立：中級三科 150 題修正（截斷/殘留字元/補解析）+ 初級兩科四梯次 PDF 轉換建立 + 前端接入                                                     |
