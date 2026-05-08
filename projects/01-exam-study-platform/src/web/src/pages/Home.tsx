@@ -5,6 +5,8 @@ import { useViewer } from "../hooks/useViewer";
 import type { SubjectKey } from "../types";
 import { EXAM_GROUPS, PARENT_GROUPS, SUBJECTS } from "../types";
 import BattlePage from "./BattlePage";
+import LeaderboardPage from "./LeaderboardPage";
+import StoryPage from "./StoryPage";
 
 type Mode =
   | "home"
@@ -12,7 +14,9 @@ type Mode =
   | "sub-category-select"
   | "subject-select"
   | "session-select"
-  | "quiz";
+  | "quiz"
+  | "story"
+  | "leaderboard";
 type QuizView = "single" | "batch" | "battle";
 
 const BATCH_SIZE = 10;
@@ -327,31 +331,100 @@ export default function Home() {
         {error && <p className="text-center text-red-500">{error}</p>}
         <div className="space-y-3">
           {data?.sessions.map((s) => (
-            <button
+            <div
               key={s.session}
-              onClick={() => {
-                setSelectedSession(s.session);
-                setPage(0);
-                setMode("quiz");
-              }}
-              className="flex w-full items-center justify-between rounded-xl border border-[#1f1f1f]
-                         bg-[#111] px-6 py-4 text-left transition hover:border-[#76b900]"
+              className="rounded-xl border border-[#1f1f1f] bg-[#111] px-4 py-3"
             >
-              <span className="font-medium text-gray-200">{s.session}</span>
-              <span className="text-sm text-[#76b900]">
-                {s.questions.length} 題
-              </span>
-            </button>
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-medium text-gray-200">{s.session}</span>
+                <span className="text-sm text-[#76b900]">
+                  {s.questions.length} 題
+                </span>
+              </div>
+              <div className="grid grid-cols-4 gap-1.5">
+                <button
+                  onClick={() => {
+                    setSelectedSession(s.session);
+                    setQuizView("single");
+                    setPage(0);
+                    setMode("quiz");
+                  }}
+                  className="rounded-lg border border-[#2a2a2a] bg-[#0a0a0a] py-2 text-xs font-medium
+                             text-gray-400 transition hover:border-[#76b900] hover:text-[#76b900]"
+                >
+                  1題
+                </button>
+                <button
+                  onClick={() => {
+                    setSelectedSession(s.session);
+                    setQuizView("batch");
+                    setPage(0);
+                    setMode("quiz");
+                  }}
+                  className="rounded-lg border border-[#2a2a2a] bg-[#0a0a0a] py-2 text-xs font-medium
+                             text-gray-400 transition hover:border-[#76b900] hover:text-[#76b900]"
+                >
+                  10題
+                </button>
+                <button
+                  onClick={() => {
+                    setSelectedSession(s.session);
+                    setQuizView("battle");
+                    setPage(0);
+                    setMode("quiz");
+                  }}
+                  className="rounded-lg border border-[#2a2a2a] bg-[#0a0a0a] py-2 text-xs font-medium
+                             text-gray-400 transition hover:border-green-700 hover:text-green-400"
+                >
+                  對戰
+                </button>
+                <button
+                  onClick={() => {
+                    setSelectedSession(s.session);
+                    setMode("story");
+                  }}
+                  className="rounded-lg border border-[#2a2a2a] bg-[#0a0a0a] py-2 text-xs font-medium
+                             text-gray-400 transition hover:border-purple-600 hover:text-purple-400"
+                >
+                  劇情
+                </button>
+              </div>
+            </div>
           ))}
         </div>
       </div>
     );
   }
 
+  if (mode === "leaderboard") {
+    return <LeaderboardPage onBack={() => setMode("home")} />;
+  }
+
   // ── 刷題頁 ──
   const q = questions[page];
 
-  // 頂部 header（兩種模式共用）
+  if (mode === "story" && selectedKey && selectedSession) {
+    return (
+      <StoryPage
+        subjectKey={selectedKey}
+        sessionName={selectedSession}
+        onBack={() => setMode("session-select")}
+        onHome={() => setMode("home")}
+      />
+    );
+  }
+
+  if (quizView === "battle") {
+    return (
+      <BattlePage
+        initialKey={selectedKey ?? undefined}
+        initialSession={selectedSession ?? undefined}
+        onBack={() => setMode("session-select")}
+      />
+    );
+  }
+
+  // 頂部 header（單題 / 10題模式共用）
   const QuizHeader = () => (
     <div className="mb-4">
       <div className="flex items-center justify-between">
@@ -362,39 +435,6 @@ export default function Home() {
           ← 返回
         </button>
         <span className="text-sm text-gray-500">{selectedSession}</span>
-      </div>
-      {/* 模式切換 */}
-      <div className="mt-3 flex rounded-lg border border-[#1f1f1f] bg-[#0a0a0a] p-1">
-        <button
-          onClick={() => {
-            setQuizView("single");
-            setPage(0);
-          }}
-          className={`flex-1 rounded-md py-1.5 text-xs font-semibold transition
-            ${quizView === "single" ? "bg-[#76b900] text-black" : "text-gray-500 hover:text-white"}`}
-        >
-          單題模式
-        </button>
-        <button
-          onClick={() => {
-            setQuizView("batch");
-            setPage(0);
-          }}
-          className={`flex-1 rounded-md py-1.5 text-xs font-semibold transition
-            ${quizView === "batch" ? "bg-[#76b900] text-black" : "text-gray-500 hover:text-white"}`}
-        >
-          10題模式
-        </button>
-        <button
-          onClick={() => {
-            setQuizView("battle");
-            setPage(0);
-          }}
-          className={`flex-1 rounded-md py-1.5 text-xs font-semibold transition
-            ${quizView === "battle" ? "bg-green-500 text-black" : "text-gray-500 hover:text-white"}`}
-        >
-          ⚔ 對戰模式
-        </button>
       </div>
     </div>
   );
@@ -436,16 +476,6 @@ export default function Home() {
           </button>
         </div>
       </div>
-    );
-  }
-
-  if (quizView === "battle") {
-    return (
-      <BattlePage
-        initialKey={selectedKey ?? undefined}
-        initialSession={selectedSession ?? undefined}
-        onBack={() => setQuizView("single")}
-      />
     );
   }
 
