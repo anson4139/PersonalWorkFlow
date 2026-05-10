@@ -30,7 +30,7 @@ SCRIPTS_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = SCRIPTS_DIR.parents[1]
 WORKSPACE_ROOT = PROJECT_ROOT.parents[1]
 
-PDF_DIR = WORKSPACE_ROOT / "AI應用規劃師試題" / "初級"
+PDF_DIR = PROJECT_ROOT / "data" / "raw-pdf" / "ai-planning" / "初級"
 OUTPUT_DIRS = [
     PROJECT_ROOT / "data" / "subjects",
     PROJECT_ROOT / "src" / "web" / "public" / "data" / "subjects",

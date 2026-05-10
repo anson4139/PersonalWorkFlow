@@ -11,7 +11,12 @@ sys.stdout.reconfigure(encoding="utf-8")
 
 from pypdf import PdfReader
 
-BASE = pathlib.Path(r"D:\Anson\PersonalWorkFlow\drive-download-20260509T110258Z-3-001")
+BASE = (
+    pathlib.Path(__file__).resolve().parents[2]
+    / "data"
+    / "raw-pdf"
+    / "securities-broker"
+)
 ANSWER_PAIR_RE = re.compile(r"(?<!\d)([1-5]?\d)\s+([A-D])(?![A-Z])")
 
 

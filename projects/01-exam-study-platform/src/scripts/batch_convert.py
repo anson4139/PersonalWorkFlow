@@ -18,7 +18,7 @@ SCRIPT_DIR = pathlib.Path(__file__).parent
 CHECKPOINT = SCRIPT_DIR / "_batch_checkpoint.json"
 PYTHON = sys.executable
 CONVERT_SCRIPT = str(SCRIPT_DIR / "pdf_convert_all.py")
-SOURCE = r"D:\Anson\PersonalWorkFlow\drive-download-20260509T110258Z-3-001"
+SOURCE = str(SCRIPT_DIR.parents[1] / "data" / "raw-pdf" / "securities-broker")
 
 ALL_YEARS = list(range(105, 116))  # 105-115
 

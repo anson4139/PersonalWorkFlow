@@ -2,9 +2,16 @@ import re
 import sys
 
 sys.stdout.reconfigure(encoding="utf-8")
+import pathlib as _pathlib
+
 from pypdf import PdfReader
 
-SOURCE = r"D:\Anson\PersonalWorkFlow\drive-download-20260509T110258Z-3-001"
+SOURCE = str(
+    _pathlib.Path(__file__).resolve().parents[2]
+    / "data"
+    / "raw-pdf"
+    / "securities-broker"
+)
 
 
 def find_q_raw(pdf_path, q_no):

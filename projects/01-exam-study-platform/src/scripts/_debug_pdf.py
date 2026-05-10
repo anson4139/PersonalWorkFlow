@@ -13,7 +13,13 @@ from pypdf import PdfReader
 from pypdf.generic import NameObject
 
 # 先分析 105 Q2 財分 Q13 的原始 PDF 文字
-pdf_path = r"D:\Anson\PersonalWorkFlow\drive-download-20260509T110258Z-3-001\105\105 Q2證券投資與財務分析.pdf"
+_RAW_PDF_BASE = (
+    pathlib.Path(__file__).resolve().parents[2]
+    / "data"
+    / "raw-pdf"
+    / "securities-broker"
+)
+pdf_path = str(_RAW_PDF_BASE / "105" / "105 Q2證券投資與財務分析.pdf")
 reader = PdfReader(pdf_path)
 for i, page in enumerate(reader.pages):
     text = page.extract_text() or ""
@@ -53,12 +59,12 @@ for i, page in enumerate(reader.pages):
 if False:
     TEST_FILES = [
         # 107 A-class（答案全缺）
-        r"D:\Anson\PersonalWorkFlow\drive-download-20260509T110258Z-3-001\107\(證券商業務員) 107年Q1證券交易相關法規與實務.pdf",
-        r"D:\Anson\PersonalWorkFlow\drive-download-20260509T110258Z-3-001\107\107年 證券商業務員_Q4證券交易相關法規與實務.pdf",
+        str(_RAW_PDF_BASE / "107" / "(證券商業務員) 107年Q1證券交易相關法規與實務.pdf"),
+        str(_RAW_PDF_BASE / "107" / "107年 證券商業務員_Q4證券交易相關法規與實務.pdf"),
         # 106 Q3（答案缺）
-        r"D:\Anson\PersonalWorkFlow\drive-download-20260509T110258Z-3-001\106\106年證券商業務員_Q3證券交易相關法規與實務.pdf",
+        str(_RAW_PDF_BASE / "106" / "106年證券商業務員_Q3證券交易相關法規與實務.pdf"),
         # 106 Q4（題答 PDF，答案缺）
-        r"D:\Anson\PersonalWorkFlow\drive-download-20260509T110258Z-3-001\106\證券商業務員_Q4證券交易相關法規與實務_題答.pdf",
+        str(_RAW_PDF_BASE / "106" / "證券商業務員_Q4證券交易相關法規與實務_題答.pdf"),
     ]
 
 ANSWER_PAIR_RE = re.compile(r"(?<!\d)([1-5]?\d)\s+([A-D])(?![A-Z])")
