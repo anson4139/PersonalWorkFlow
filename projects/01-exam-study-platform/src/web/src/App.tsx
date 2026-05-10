@@ -6,7 +6,14 @@ function App() {
     return <AdminAccess />;
   }
 
-  return <Home />;
+  return (
+    <>
+      <Home />
+      <div className="fixed bottom-2 right-3 text-[10px] text-gray-600 select-none pointer-events-none">
+        v{__APP_VERSION__}
+      </div>
+    </>
+  );
 }
 
 export default App;
