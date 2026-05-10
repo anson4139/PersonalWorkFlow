@@ -22,7 +22,7 @@ type QuizView = "single" | "batch" | "battle";
 const BATCH_SIZE = 10;
 
 export default function Home() {
-  const { viewer, loading: viewerLoading } = useViewer();
+  const { viewer, loading: viewerLoading, sessionFailed } = useViewer();
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
   const [selectedKey, setSelectedKey] = useState<SubjectKey | null>(null);
   const [selectedSession, setSelectedSession] = useState<string | null>(null);
@@ -136,6 +136,19 @@ export default function Home() {
                 ? `管理者已登入：${viewer.email ?? "Anson"}`
                 : `已登入：${viewer.email ?? "使用者"} / 可見 ${viewer.allowedSubjects.length} 個科目`}
           </p>
+          {!viewerLoading && sessionFailed && (
+            <p className="mt-3">
+              <span className="mr-2 text-xs text-yellow-500">
+                登入 session 已失效
+              </span>
+              <a
+                href="/cdn-cgi/access/logout?redirect_to=https://exam.buclaw.org/"
+                className="text-xs font-semibold text-[#76b900] transition hover:text-white"
+              >
+                重新登入
+              </a>
+            </p>
+          )}
         </div>
         <div className="space-y-3">
           {homeItems.map((item) => (

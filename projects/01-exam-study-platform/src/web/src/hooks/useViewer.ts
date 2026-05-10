@@ -67,6 +67,10 @@ function createViewer(
   };
 }
 
+// In production (no DEV_VIEWER_EMAIL), a null email from the API means CF Access
+// session has expired or is invalid.
+const IS_PROD_BUILD = !DEV_VIEWER_EMAIL;
+
 export function useViewer() {
   const [viewer, setViewer] = useState<Viewer>(() => {
     const email = normalizeEmail(DEV_VIEWER_EMAIL);
@@ -75,6 +79,7 @@ export function useViewer() {
     return createViewer(email, isAdmin, getDevAllowedSubjects(email, isAdmin));
   });
   const [loading, setLoading] = useState(true);
+  const [sessionFailed, setSessionFailed] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -101,6 +106,13 @@ export function useViewer() {
         // fall back to VITE_DEV_VIEWER_EMAIL so local testing still works.
         const email =
           normalizeEmail(data.email) ?? normalizeEmail(DEV_VIEWER_EMAIL);
+
+        // In production, if the API returned null email it means CF Access session
+        // is invalid or expired — surface a re-login prompt.
+        if (IS_PROD_BUILD && !email) {
+          setSessionFailed(true);
+        }
+
         const isAdmin =
           Boolean(data.isAdmin) ||
           DEV_IS_ADMIN ||
@@ -118,6 +130,11 @@ export function useViewer() {
       } catch {
         if (!active) {
           return;
+        }
+
+        // Network / function error — treat as session failure in production.
+        if (IS_PROD_BUILD) {
+          setSessionFailed(true);
         }
 
         const email = normalizeEmail(DEV_VIEWER_EMAIL);
@@ -141,5 +158,5 @@ export function useViewer() {
     };
   }, []);
 
-  return { viewer, loading };
+  return { viewer, loading, sessionFailed };
 }

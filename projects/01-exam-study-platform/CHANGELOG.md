@@ -3,6 +3,21 @@
 ## [Unreleased]
 
 ### Added
+
+- `pdf_convert_all.py` 新增 `IMAGE_EXTRACTED_ANSWERS` 字典：手動辨識 106 Q3/Q4、107 Q1-Q4、108 Q1-Q4、109 Q1/Q2 共 22 組圖片嵌入答案（各 50 題），套用至 `parse_a_class_file`，所有 A class session 答案缺漏降至 0
+- `useViewer.ts` 新增 `sessionFailed` 狀態：當正式站 `/api/session` 回傳 null email 或 non-200 時標記失效
+- `Home.tsx` 新增「登入 session 已失效 / 重新登入」提示，點擊導向 CF Access logout 並重新驗證
+- `pdf_convert_all.py` 重新解析 105~115 年全量題庫，新版源自 `drive-download-20260509T110258Z-3-001`
+
+### Fixed
+
+- `pdf_convert_all.py` 修正 `parse_options_sequential()` fallback 策略：當選項間無空格分隔（如 `成交量過度異常者(D)選項`）時，改用自由模式尋找下一選項邊界；徹底解決 A/B 選項空白問題，全年份正式科目空白選項降至 0
+- `pdf_convert_all.py` 新增 `ANSWER_JUNGEIFEN_RE`：識別「均給分」特殊答案；修正 109 Q3 法規第 9 題無法被擷取的問題
+- `pdf_convert_all.py` 修正 `OPTION_RE` 選項解析 bug（改用 `parse_options_sequential()`）：選項內含括號引用（如「選項(A)(B)(C)皆非」）時誤截斷，修復約 500 題選項文字；正式科目空白選項 509 → 0
+- `QUESTION_START_RE` 修正：題目解析允許句點後無空格（如 `1.影響金融市場...`），修正 109 Q4 財分 0 題 regression
+
+### Added
+
 - 新增 `113電子商務財務管理(期中考)` 題庫匯入流程與目標 JSON 檔命名
 - 新增依登入 email 顯示題庫分類的前端身份辨識流程
 - 新增 Cloudflare Pages Functions 的 session API 與題庫 JSON 路徑保護
@@ -20,6 +35,7 @@
 - 新增證券商業務員（初業）110~115 題庫解析內容並完成正式站資料同步
 
 ### Changed
+
 - 首頁導覽由平面科目列表改為考試分類 -> 科目兩層結構
 - 正式站 metadata 與部署腳本改為對應 `https://exam.buclaw.org/`
 - Cloudflare Access 身份解析改為透過 `CF_Authorization` cookie 取得使用者 identity，修正正式站登入後仍顯示一般權限的問題
@@ -31,9 +47,11 @@
 ## [2026-04-29]
 
 ### Changed
+
 - 標題標籤由 `Study Platform` 改為 `Anson's Study Platform`
 - 頁面 `<title>` 由 `web` 改為 `Anson's Study Platform`
 - 部署至 `exam.buclaw.org`（Cloudflare Pages）
 
 ### Added
+
 - 專案骨架建立（src/web, src/scripts, data, specs, tests）

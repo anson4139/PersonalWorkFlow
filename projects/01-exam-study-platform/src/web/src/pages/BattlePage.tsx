@@ -1451,7 +1451,7 @@ export default function BattlePage({
                 </button>
                 <button
                   onClick={cycleFontSize}
-                  className="text-xs font-mono text-gray-600 hover:text-gray-400 transition-colors"
+                  className="text-xs font-mono font-bold text-[#76b900] hover:text-white transition-colors"
                   title="切換字體大小"
                 >
                   字體：
@@ -1696,7 +1696,7 @@ export default function BattlePage({
               <div className="flex items-center gap-2">
                 <button
                   onClick={cycleFontSize}
-                  className="text-xs font-mono text-gray-600 hover:text-gray-400 transition-colors px-1"
+                  className="text-xs font-mono font-bold text-[#76b900] hover:text-white transition-colors px-1"
                   title="切換字體大小"
                 >
                   {fontSize === "sm" ? "小" : fontSize === "md" ? "中" : "大"}
