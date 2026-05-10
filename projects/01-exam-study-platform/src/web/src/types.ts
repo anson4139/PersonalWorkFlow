@@ -8,6 +8,7 @@ export interface Question {
   explanation: string;
   code_block?: string | null;
   image_url?: string | null;
+  option_images?: Partial<Record<"A" | "B" | "C" | "D", string>>;
 }
 
 export interface Session {

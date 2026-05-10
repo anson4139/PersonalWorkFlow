@@ -1949,7 +1949,15 @@ export default function BattlePage({
                     className={`w-full text-left px-3 py-2.5 rounded border ${fontClass} transition-colors ${getOptionStyle(label)}`}
                   >
                     <span className="font-bold mr-2">{label}.</span>
-                    {question.options[label]}
+                    {question.option_images?.[label] ? (
+                      <img
+                        src={question.option_images[label]}
+                        alt={`選項 ${label}`}
+                        className="mt-1 max-w-full rounded border border-[#2a2a2a]"
+                      />
+                    ) : (
+                      question.options[label]
+                    )}
                   </button>
                 ))}
             </div>

@@ -634,7 +634,13 @@
           "answer": "B",
           "explanation": "PDF 原始試題未附解析",
           "code_block": null,
-          "image_url": "[程式碼選項嵌入題目圖片中，A/B/C 選項詳見原始 PDF 圖片]"
+          "image_url": "[程式碼選項嵌入題目圖片中，A/B/C 選項詳見原始 PDF 圖片]",
+          "option_images": {
+            "A": "/images/questions/machine-learning/q45-a.png",
+            "B": "/images/questions/machine-learning/q45-b.png",
+            "C": "/images/questions/machine-learning/q45-c.png",
+            "D": "/images/questions/machine-learning/q45-d.png"
+          }
         },
         {
           "no": 46,

@@ -142,13 +142,24 @@ export default function QuestionCard({
               "border-[#76b900] bg-[#0f1900] text-[#b9ef65] font-semibold";
           }
 
+          const optImg = question.option_images?.[opt];
+
           if (!isSelectable) {
             return (
               <div
                 key={opt}
                 className={`rounded-lg border px-4 py-3 text-sm leading-relaxed ${optionClass}`}
               >
-                ({opt}) {text}
+                <span className="mr-1">({opt})</span>
+                {optImg ? (
+                  <img
+                    src={optImg}
+                    alt={`選項 ${opt}`}
+                    className="mt-2 max-w-full rounded border border-[#2a2a2a]"
+                  />
+                ) : (
+                  text
+                )}
               </div>
             );
           }
@@ -161,7 +172,16 @@ export default function QuestionCard({
               disabled={disableSelection}
               className={`w-full rounded-lg border px-4 py-3 text-left text-sm leading-relaxed transition ${optionClass} ${disableSelection ? "cursor-not-allowed opacity-80" : "hover:border-[#76b900] hover:text-white"}`}
             >
-              ({opt}) {text}
+              <span className="mr-1">({opt})</span>
+              {optImg ? (
+                <img
+                  src={optImg}
+                  alt={`選項 ${opt}`}
+                  className="mt-2 max-w-full rounded border border-[#2a2a2a]"
+                />
+              ) : (
+                text
+              )}
             </button>
           );
         })}
