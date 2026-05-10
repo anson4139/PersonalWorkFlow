@@ -7,9 +7,9 @@
 
 | 項目     | 內容                               |
 | -------- | ---------------------------------- |
-| 狀態     | `active`                           |
+| 狀態     | `closed`                           |
 | 建立日期 | 2026-05-09                         |
-| 最後更新 | 2026-05-09（v0.1 提案初稿）        |
+| 最後更新 | 2026-05-10（v1.0 全部完成，結案）  |
 | 對應專案 | `projects/01-exam-study-platform/` |
 
 ---
@@ -17,9 +17,11 @@
 <details>
 <summary>## 異動記錄</summary>
 
-| 日期       | 版本 | 更新人 | 變更說明     |
-| ---------- | ---- | ------ | ------------ |
-| 2026-05-09 | v0.1 | Anson  | 建立提案初稿 |
+| 日期       | 版本 | 更新人 | 變更說明                                                                                                 |
+| ---------- | ---- | ------ | -------------------------------------------------------------------------------------------------------- |
+| 2026-05-10 | v1.0 | Anson  | 全部 Phase 完成，提案結案：Phase 1 前端重新登入機制、Phase 2 法規題庫重新解析、Phase 3 AI 解析補齊均完成 |
+| 2026-05-10 | v0.2 | Anson  | Phase 0 完成（CF Session Duration 設為 24h）；Phase 4 驗收通過（無痕 + 正常模式登入流程均正常）          |
+| 2026-05-09 | v0.1 | Anson  | 建立提案初稿                                                                                             |
 
 </details>
 
@@ -147,35 +149,35 @@
 
 ### Phase 0：確認 CF Access 設定（手動操作）
 
-- [ ] Cloudflare Zero Trust → Access → Applications → `exam.buclaw.org`
-- [ ] 將 Session Duration 設為 24h（減少 session 失效頻率）
-- [ ] 確認 Policy 設定（建議：Allow → Include → Emails → anson4139@gmail.com + Bypass 所有其他路由，或改用 Allow Everyone 讓登入識別身份用）
+- [x] Cloudflare Zero Trust → Access → Applications → `exam.buclaw.org`
+- [x] 將 Session Duration 設為 24h（減少 session 失效頻率）
+- [x] 確認 Policy 設定（建議：Allow → Include → Emails → anson4139@gmail.com + Bypass 所有其他路由，或改用 Allow Everyone 讓登入識別身份用）
 
 ### Phase 1：前端重新登入機制
 
-- [ ] `useViewer.ts`：當 `/api/session` 返回 401 或網路錯誤，設 `sessionFailed = true`
-- [ ] `Home.tsx`：`sessionFailed` 時在頂部顯示「登入 session 已失效，請重新登入」+ 按鈕，跳轉 `/cdn-cgi/access/logout?redirect_to=https://exam.buclaw.org/`
-- [ ] 部署並驗證（用無痕 + 正常模式各測一次）
+- [x] `useViewer.ts`：當 `/api/session` 返回 401 或網路錯誤，設 `sessionFailed = true`
+- [x] `Home.tsx`：`sessionFailed` 時在頂部顯示「登入 session 已失效，請重新登入」+ 按鈕，跳轉 `/cdn-cgi/access/logout?redirect_to=https://exam.buclaw.org/`
+- [x] 部署並驗證（用無痕 + 正常模式各測一次）
 
 ### Phase 2：法規題庫 PDF 重新解析
 
-- [ ] 建立 `src/scripts/pdf_convert_law_v2.py`，來源指向 `drive-download-20260509T110258Z-3-001/`
-- [ ] 支援 A-class（中文命名，105-108、109 Q1/Q2）與 B-class（代碼命名，109 Q3/Q4、110-115）
-- [ ] 套用 108 Q3 答案更正 patch
-- [ ] dry-run 驗證：確認每年 sessions 數量與題數正確
-- [ ] 輸出正式 JSON，覆蓋 `data/subjects/` 與 `public/data/subjects/`
+- [x] 建立 `src/scripts/pdf_convert_law_v2.py`，來源指向 `drive-download-20260509T110258Z-3-001/`
+- [x] 支援 A-class（中文命名，105-108、109 Q1/Q2）與 B-class（代碼命名，109 Q3/Q4、110-115）
+- [x] 套用 108 Q3 答案更正 patch
+- [x] dry-run 驗證：確認每年 sessions 數量與題數正確
+- [x] 輸出正式 JSON，覆蓋 `data/subjects/` 與 `public/data/subjects/`
 
 ### Phase 3：AI 解析補齊
 
-- [ ] 執行 `explain_gen.py --subject securities-broker-law-107`（answer 為空的年份）
-- [ ] 執行 `explain_gen.py --subject securities-broker-law-108`
-- [ ] 視品質決定是否補齊 105-115 全年
+- [x] 執行 `explain_gen.py --subject securities-broker-law-107`（answer 為空的年份）
+- [x] 執行 `explain_gen.py --subject securities-broker-law-108`
+- [x] 視品質決定是否補齊 105-115 全年
 
 ### Phase 4：部署與驗收
 
-- [ ] git commit + push
-- [ ] wrangler 部署（`npx wrangler pages deploy dist --project-name exam-study-platform --branch main`）
-- [ ] 驗收：瀏覽 exam.buclaw.org，測試登入 session 修正、法規題庫正確性
+- [x] git commit + push
+- [x] wrangler 部署（`npx wrangler pages deploy dist --project-name exam-study-platform --branch main`）
+- [x] 驗收：瀏覽 exam.buclaw.org，測試登入 session 修正、法規題庫正確性（無痕 + 正常模式均通過）
 
 </details>
 
