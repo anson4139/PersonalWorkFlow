@@ -684,7 +684,7 @@ export default function BattlePage({
   const [wrongCount, setWrongCount] = useState(0);
   // Monster state — switching triggered by HP reaching 0, NOT by question index
   const [currentMonsterIndex, setCurrentMonsterIndex] = useState(0);
-  const [currentMonsterCorrect, setCurrentMonsterCorrect] = useState(0);
+  const [_currentMonsterCorrect, setCurrentMonsterCorrect] = useState(0);
   const [monstersDefeated, setMonstersDefeated] = useState(0);
 
   // Answer state
