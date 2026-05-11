@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "personal-blog-platform",
+  "compatibility_date": "2026-05-10",
+  "pages_build_output_dir": "./dist",
+  "d1_databases": [
+    {
+      "binding": "BLOG_DB",
+      "database_name": "personal-blog-platform-db",
+      "database_id": "a0d545a4-2767-4c89-80d3-a9794fc8c830"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "BLOG_IMAGES",
+      "bucket_name": "personal-blog-images"
+    }
+  ]
+}
