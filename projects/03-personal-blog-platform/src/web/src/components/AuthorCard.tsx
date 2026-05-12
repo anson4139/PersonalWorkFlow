@@ -17,7 +17,7 @@ export default function AuthorCard() {
   const name = settings.author_name || "Anson Chiang";
   const bio =
     settings.author_bio || "分享 PM 方法論、AI 應用、系統分析與職涯心得。";
-  const avatar = settings.author_avatar || "/avatar.jpg";
+  const avatar = settings.author_avatar || "/logo-bu-icon.png";
 
   return (
     <div className="rounded-2xl p-5" style={cardStyle}>
