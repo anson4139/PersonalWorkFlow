@@ -149,7 +149,7 @@ async function generateInsight(openaiKey, company, weekStart, titles) {
     body: JSON.stringify({
       model: MODEL_VER,
       messages: [{ role: "user", content: prompt }],
-      max_completion_tokens: 120,
+      max_completion_tokens: 512,
     }),
     signal: AbortSignal.timeout(20000),
   });
@@ -191,7 +191,7 @@ async function main() {
     console.log("[backfill] Applying D1 migration 0008_insights.sql ...");
     try {
       execSync(
-        `npx wrangler d1 execute BLOG_DB --remote --file=src/web/migrations/0008_insights.sql`,
+        `echo y | npx wrangler d1 execute BLOG_DB --config src/web/wrangler.jsonc --remote --file=src/web/migrations/0008_insights.sql`,
         { cwd: ROOT, stdio: "inherit" },
       );
     } catch {
@@ -202,7 +202,7 @@ async function main() {
     );
     try {
       execSync(
-        `npx wrangler d1 execute BLOG_DB --remote --file=src/web/migrations/0009_insights_unique.sql`,
+        `echo y | npx wrangler d1 execute BLOG_DB --config src/web/wrangler.jsonc --remote --file=src/web/migrations/0009_insights_unique.sql`,
         { cwd: ROOT, stdio: "inherit" },
       );
     } catch {
@@ -357,7 +357,7 @@ async function main() {
   // 8. Apply to remote D1
   console.log("\n[backfill] Applying to remote D1 ...");
   execSync(
-    `npx wrangler d1 execute BLOG_DB --remote --file=scripts/backfill-insights.sql`,
+    `echo y | npx wrangler d1 execute BLOG_DB --config src/web/wrangler.jsonc --remote --file=scripts/backfill-insights.sql`,
     { cwd: ROOT, stdio: "inherit" },
   );
 
