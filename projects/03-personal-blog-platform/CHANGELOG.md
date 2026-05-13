@@ -10,6 +10,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- Added impact-level summary cards to the industry trends page so decision-makers can see weekly high, medium, and low signal counts with plain-language definitions.
 - Added an RSS-to-blog Cron Worker that collects daily RSS candidates, deduplicates URLs with KV, orchestrates the existing AI generation endpoints, publishes selected posts, and sends LINE execution summaries.
 - Added admin dashboard content trend charts for published posts and Giscus comments, backed by new `posts-timeline` and `giscus-timeline` API endpoints.
 - Added ESLint flat config for the Vite web project so `npm run lint` works with ESLint 10.
