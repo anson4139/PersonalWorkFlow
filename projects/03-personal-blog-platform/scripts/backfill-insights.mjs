@@ -110,6 +110,29 @@ function sqlEscape(str) {
   return (str ?? "").replace(/'/g, "''");
 }
 
+function normalizeTitle(title) {
+  return (title ?? "")
+    .normalize("NFKC")
+    .toLowerCase()
+    .replace(
+      /\s+[-|｜]\s*(msn|聯合新聞網|經濟日報|ettoday財經雲|yahoo股市|鉅亨網|moneydj理財網|cnyes\.com)$/i,
+      "",
+    )
+    .replace(/[\s\u3000"'“”‘’|｜:：,，.。!！?？;；、\-—–_()/（）【】]+/g, "");
+}
+
+function uniqueTitles(titles) {
+  const seen = new Set();
+  const result = [];
+  for (const title of titles) {
+    const key = normalizeTitle(title);
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    result.push(title);
+  }
+  return result;
+}
+
 // --- FinMind fetch -----------------------------------------------------------
 
 async function fetchFinMind(token, date) {
@@ -264,8 +287,11 @@ async function main() {
 
   let totalGroups = 0;
   for (const [companyName, weeks] of grouped) {
-    const count = [...weeks.values()].reduce((s, v) => s + v.titles.length, 0);
-    console.log(`  ${companyName}: ${weeks.size} weeks, ${count} total hits`);
+    const count = [...weeks.values()].reduce(
+      (s, v) => s + uniqueTitles(v.titles).length,
+      0,
+    );
+    console.log(`  ${companyName}: ${weeks.size} weeks, ${count} unique hits`);
     totalGroups += weeks.size;
   }
   console.log(
@@ -280,13 +306,14 @@ async function main() {
     for (const [weekStart, { company, titles }] of [
       ...weeks.entries(),
     ].sort()) {
-      if (titles.length === 0) continue;
+      const dedupedTitles = uniqueTitles(titles);
+      if (dedupedTitles.length === 0) continue;
 
       let direction = "";
       let modelVer = "none";
 
       if (DRY_RUN) {
-        direction = `[DRY RUN] ${companyName} 本週 ${titles.length} 筆`;
+        direction = `[DRY RUN] ${companyName} 本週 ${dedupedTitles.length} 筆`;
         modelVer = "dry-run";
       } else {
         try {
@@ -295,35 +322,44 @@ async function main() {
             OPENAI_API_KEY,
             companyName,
             weekStart,
-            titles,
+            dedupedTitles,
           );
           modelVer = MODEL_VER;
           aiCalls++;
           console.log(
-            `  [AI] ${companyName} ${weekStart} (${titles.length} hits) → "${direction.slice(0, 60)}..."`,
+            `  [AI] ${companyName} ${weekStart} (${dedupedTitles.length} unique hits) → "${direction.slice(0, 60)}..."`,
           );
         } catch (err) {
           console.warn(
             `  [WARN] AI failed for ${companyName} ${weekStart}: ${err.message}`,
           );
-          direction = `${companyName} 本週出現 ${titles.length} 筆相關新聞，動向待分析。`;
+          direction = `${companyName} 本週出現 ${dedupedTitles.length} 筆相關新聞，動向待分析。`;
           modelVer = "fallback";
         }
       }
 
       const impact =
-        titles.length >= 10 ? "high" : titles.length >= 4 ? "medium" : "low";
+        dedupedTitles.length >= 10
+          ? "high"
+          : dedupedTitles.length >= 4
+            ? "medium"
+            : "low";
       const keyEvents = JSON.stringify(
-        titles.slice(0, 5).map((t) => ({ title: t })),
+        dedupedTitles.slice(0, 5).map((t) => ({ title: t })),
       );
 
       inserts.push(
-        `INSERT OR IGNORE INTO insights ` +
+        `INSERT INTO insights ` +
           `(week_start, entity, entity_group, hit_count, direction, key_events, impact, ` +
           `data_source, model_ver, prompt_ver) ` +
           `VALUES ('${weekStart}', '${sqlEscape(companyName)}', '${sqlEscape(company.group)}', ` +
-          `${titles.length}, '${sqlEscape(direction)}', '${sqlEscape(keyEvents)}', ` +
-          `'${impact}', 'FINMIND', '${modelVer}', '${PROMPT_VER}');`,
+          `${dedupedTitles.length}, '${sqlEscape(direction)}', '${sqlEscape(keyEvents)}', ` +
+          `'${impact}', 'FINMIND', '${modelVer}', '${PROMPT_VER}') ` +
+          `ON CONFLICT(week_start, entity, data_source) DO UPDATE SET ` +
+          `entity_group=excluded.entity_group, hit_count=excluded.hit_count, ` +
+          `direction=excluded.direction, key_events=excluded.key_events, ` +
+          `impact=excluded.impact, model_ver=excluded.model_ver, ` +
+          `prompt_ver=excluded.prompt_ver, created_at=datetime('now');`,
       );
     }
   }
