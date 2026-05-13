@@ -1,0 +1,21 @@
+name = "personal-blog-platform-auto-pipeline"
+main = "./index.ts"
+compatibility_date = "2026-05-10"
+
+[triggers]
+# 每天 23:00 UTC = 07:00 UTC+8 → 日報 pipeline
+# 每週一 00:00 UTC = 08:00 UTC+8 → 產業趨勢 insights 生成
+crons = ["0 23 * * *", "0 0 * * 1"]
+
+[[d1_databases]]
+binding = "BLOG_DB"
+database_name = "personal-blog-platform-db"
+database_id = "a0d545a4-2767-4c89-80d3-a9794fc8c830"
+
+[[kv_namespaces]]
+binding = "PIPELINE_DEDUP"
+id = "35b8442420a9451a955370c053a32c32"
+
+[vars]
+BLOG_BASE_URL = "https://blog.buclaw.org"
+LINE_USER_ID = "U58f2e37ee1ccebb07d8f437c4fa5f976"

@@ -1,0 +1,41 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --color-brand: #76b900;
+}
+
+/* ===== Design Tokens (matches resume.buclaw.org / exam.buclaw.org) ===== */
+:root {
+  --green: #76B900;
+  --green-light: #96d400;
+  --green-dim: rgba(118, 185, 0, 0.10);
+  --green-border: rgba(118, 185, 0, 0.28);
+  --bg: #080808;
+  --surface: #0f0f0f;
+  --surface-2: #161616;
+  --surface-3: #1d1d1d;
+  --border: rgba(255, 255, 255, 0.07);
+  --text: #F0F0F0;
+  --text-dim: #949494;
+  --text-muted: #4a4a4a;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Barlow', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--green); }
+
+a { color: inherit; text-decoration: none; }

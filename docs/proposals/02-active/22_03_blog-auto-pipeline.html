@@ -1,0 +1,1579 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>22_03 Blog 自動化內容 Pipeline 系統規格書</title>
+  <style>
+    :root {
+      --bg: #0a0d0b;
+      --panel: #111612;
+      --panel-2: #171d18;
+      --panel-3: #1d251f;
+      --text: #edf3ed;
+      --muted: #aab6ab;
+      --line: #243127;
+      --line-strong: #33503c;
+      --accent: #86f08b;
+      --accent-soft: rgba(134, 240, 139, 0.08);
+      --warn: #e7ff85;
+      --danger: #ff8b8b;
+      --shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+      --radius: 20px;
+      --content-width: 1500px;
+      --toc-width: 290px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Noto Sans TC", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top right, rgba(134, 240, 139, 0.08), transparent 28%),
+        linear-gradient(180deg, #060806 0%, #0a0d0b 100%);
+      line-height: 1.72;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    code {
+      font-family: Consolas, monospace;
+      font-size: 0.95em;
+      padding: 0.15rem 0.45rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+    }
+    pre {
+      margin: 12px 0 0;
+      padding: 16px;
+      overflow-x: auto;
+      border-radius: 16px;
+      border: 1px solid rgba(134, 240, 139, 0.08);
+      background: rgba(4, 7, 5, 0.92);
+      color: #d8e8d8;
+      line-height: 1.6;
+      font-family: Consolas, monospace;
+      font-size: 0.92rem;
+    }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(18px);
+      background: rgba(8, 12, 9, 0.82);
+      border-bottom: 1px solid rgba(134, 240, 139, 0.08);
+    }
+    .topbar-inner, .shell {
+      width: min(var(--content-width), calc(100% - 28px));
+      margin: 0 auto;
+    }
+    .topbar-inner {
+      padding: 14px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+    .brand {
+      font-size: 0.84rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .topbar-note { color: var(--muted); font-size: 0.92rem; text-align: right; }
+    .shell { padding: 20px 0 48px; }
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, var(--toc-width)) minmax(0, 1fr);
+      gap: 22px;
+      align-items: start;
+    }
+    .toc {
+      position: sticky;
+      top: 74px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(20, 27, 22, 0.94), rgba(13, 18, 14, 0.94));
+      box-shadow: var(--shadow);
+    }
+    .toc h2 { margin: 0 0 10px; font-size: 1rem; }
+    .toc p { margin: 0 0 14px; color: var(--muted); font-size: 0.93rem; }
+    .toc ol { margin: 0; padding-left: 18px; color: var(--muted); }
+    .toc li { margin-bottom: 10px; }
+    .toc a { color: #cfe8d0; }
+    .content { display: grid; gap: 20px; }
+    .section {
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(19, 24, 20, 0.97), rgba(11, 15, 12, 0.98));
+      box-shadow: var(--shadow);
+    }
+    .hero {
+      padding: 28px;
+      background:
+        linear-gradient(135deg, rgba(134, 240, 139, 0.1), transparent 30%),
+        linear-gradient(180deg, rgba(21, 29, 23, 0.98), rgba(12, 16, 13, 0.98));
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--line-strong);
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .eyebrow::before {
+      content: "";
+      width: 8px; height: 8px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 12px rgba(134, 240, 139, 0.6);
+    }
+    h1, h2, h3, h4 { margin: 0; line-height: 1.2; }
+    h1 { font-size: clamp(2.2rem, 4vw, 3.8rem); margin-top: 18px; }
+    h2 { font-size: clamp(1.5rem, 2.2vw, 2.2rem); margin-bottom: 16px; }
+    h3 { font-size: 1.02rem; color: var(--accent); margin-bottom: 10px; letter-spacing: 0.04em; }
+    h4 { font-size: 1rem; margin-bottom: 8px; color: var(--text); }
+    p { margin: 0; color: var(--muted); }
+    .lead { font-size: 1.08rem; max-width: 86ch; margin-top: 14px; }
+    .accent-line {
+      width: 110px; height: 4px;
+      border-radius: 999px;
+      margin: 16px 0 20px;
+      background: linear-gradient(90deg, var(--accent), rgba(134, 240, 139, 0.12));
+    }
+    .grid-2, .grid-3, .grid-4 { display: grid; gap: 16px; }
+    .grid-2 { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+    .grid-4 { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+    .grid-2 > *, .grid-3 > *, .grid-4 > * { min-width: 0; }
+    .card, .note, .spec-block {
+      padding: 18px;
+      min-width: 0;
+      border: 1px solid rgba(134, 240, 139, 0.08);
+      border-radius: 16px;
+      background: linear-gradient(180deg, rgba(25, 33, 27, 0.92), rgba(16, 20, 17, 0.94));
+    }
+    .metric {
+      display: block;
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+    .kv, .matrix {
+      width: 100%;
+      table-layout: fixed;
+      border-collapse: collapse;
+      margin-top: 12px;
+      overflow: hidden;
+      border-radius: 16px;
+    }
+    .kv th, .kv td, .matrix th, .matrix td {
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(134, 240, 139, 0.08);
+      text-align: left;
+      vertical-align: top;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .kv th, .matrix th {
+      color: var(--text);
+      background: rgba(134, 240, 139, 0.06);
+      font-weight: 600;
+    }
+    .kv th { width: 200px; }
+    .kv td, .matrix td { color: var(--muted); background: rgba(255,255,255,0.02); }
+    .kv tr:last-child th, .kv tr:last-child td,
+    .matrix tr:last-child th, .matrix tr:last-child td { border-bottom: none; }
+    .matrix th:nth-child(1), .matrix td:nth-child(1) { width: 28%; }
+    .matrix th:nth-child(2), .matrix td:nth-child(2) { width: 20%; }
+    .matrix th:nth-child(3), .matrix td:nth-child(3) { width: 52%; }
+    .list { margin: 0; padding-left: 20px; color: var(--muted); }
+    .list li { margin-bottom: 10px; }
+    .callout {
+      margin-top: 16px;
+      padding: 16px 18px;
+      border-left: 4px solid var(--accent);
+      border-radius: 0 14px 14px 0;
+      background: rgba(134, 240, 139, 0.08);
+      color: var(--text);
+    }
+    .callout.warn { border-left-color: var(--warn); background: rgba(231,255,133,0.08); }
+    .callout.danger { border-left-color: var(--danger); background: rgba(255,139,139,0.08); }
+    .badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      background: rgba(134, 240, 139, 0.12);
+      color: var(--accent);
+      border: 1px solid rgba(134, 240, 139, 0.2);
+    }
+    .badge.warn { background: rgba(231,255,133,0.12); color: var(--warn); border-color: rgba(231,255,133,0.2); }
+    .badge.danger { background: rgba(255,139,139,0.12); color: var(--danger); border-color: rgba(255,139,139,0.2); }
+    .flow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-top: 12px;
+    }
+    .flow-step {
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: 1px solid var(--line-strong);
+      background: var(--accent-soft);
+      color: var(--text);
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    .flow-arrow { color: var(--accent); font-size: 1.2rem; font-weight: 700; }
+    .matrix-4col th:nth-child(1), .matrix-4col td:nth-child(1) { width: 11%; }
+    .matrix-4col th:nth-child(2), .matrix-4col td:nth-child(2) { width: 9%; }
+    .matrix-4col th:nth-child(3), .matrix-4col td:nth-child(3) { width: 12%; }
+    .matrix-4col th:nth-child(4), .matrix-4col td:nth-child(4) { width: 68%; }
+    .footer {
+      color: #879588;
+      font-size: 0.9rem;
+      text-align: center;
+      padding-top: 6px;
+    }
+    @media (max-width: 1080px) {
+      .layout { grid-template-columns: 1fr; }
+      .toc { position: static; }
+    }
+    @media (max-width: 760px) {
+      .topbar-inner, .shell { width: min(100% - 16px, var(--content-width)); }
+      .section, .hero { padding: 18px; }
+      .kv th { width: 130px; }
+      .topbar-inner { flex-direction: column; align-items: flex-start; }
+      .topbar-note { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">Blog Auto Pipeline Spec</div>
+      <div class="topbar-note">22_03 v1.9 — HTML 系統規格書 — Active</div>
+    </div>
+  </header>
+
+  <div class="shell">
+    <div class="layout">
+
+      <!-- TOC -->
+      <aside class="toc">
+        <h2>文件導覽</h2>
+        <p>Blog 自動化 RSS 內容 Pipeline 完整設計規格，涵蓋架構決策、實作範圍與驗收標準。</p>
+        <ol>
+          <li><a href="#overview">文件總覽</a></li>
+          <li><a href="#governance">一、異動記錄</a></li>
+          <li><a href="#todo">二、待辦事項</a></li>
+          <li><a href="#background">三、背景與目標</a></li>
+          <li><a href="#architecture">四、架構決策</a></li>
+          <li><a href="#spec">五、系統設計規格</a></li>
+          <li><a href="#impl">六、實作範圍</a></li>
+          <li><a href="#risks">七、風險與防呆機制</a></li>
+          <li><a href="#notification">八、LINE 通知規格</a></li>
+          <li><a href="#plan">九、實作計畫</a></li>
+          <li><a href="#acceptance">十、驗收矩陣</a></li>
+          <li><a href="#deploy-sop">十一、部署 SOP</a></li>
+          <li><a href="#faq">十二、運維 FAQ</a></li>
+          <li><a href="#phase2" style="color:var(--warn)">十三、PHASE 2 — 產業趨勢分析（藍圖）</a></li>
+        </ol>
+      </aside>
+
+      <main class="content">
+
+        <!-- ════════════════════════════════════════════
+             §1 文件總覽
+        ════════════════════════════════════════════ -->
+        <section class="section hero" id="overview">
+          <div class="eyebrow">Active Proposal / System Spec</div>
+          <h1>22_03 Blog 自動化內容 Pipeline</h1>
+          <div class="accent-line"></div>
+          <p class="lead">本案目標是在現有 Blog AI 生文系統之上，建立一條全自動 RSS 收集 → 分類篩選 → AI 生文 → AI 生封面 → AI 生插圖 → 自動發佈的內容生產 Pipeline，每天固定時間無需人工介入，持續輸出 <s>6 個分類</s> <strong>3 個分類（AI / 產業 / 資安）</strong>各一篇高品質中文文章。</p>
+
+          <div class="grid-4" style="margin-top: 22px;">
+            <div class="card">
+              <h3>狀態</h3>
+              <span class="metric">active</span>
+              <p>規格設計中</p>
+            </div>
+            <div class="card">
+              <h3>版本</h3>
+              <span class="metric">v1.9</span>
+              <p>PHASE 2 落地：產業趨勢 UI + 回填腳本 + 每週 Cron</p>
+            </div>
+            <div class="card">
+              <h3>建立日期</h3>
+              <span class="metric">2026-05-13</span>
+              <p>規格書建立</p>
+            </div>
+            <div class="card">
+              <h3>對應專案</h3>
+              <span class="metric">03</span>
+              <p>projects/03-personal-blog-platform/</p>
+            </div>
+          </div>
+
+          <table class="kv" style="margin-top: 20px;">
+            <tr><th>生產網址</th><td>https://blog.buclaw.org</td></tr>
+            <tr><th>依賴提案</th><td>15_03_blog-ai-upgrade.html（已結案）— 現有三個 AI endpoint 的設計基線</td></tr>
+            <tr><th>核心約束</th><td>不得修改現有 ai-generate / ai-cover / ai-illustrate 的對外行為；pipeline 只是新增一條呼叫路徑</td></tr>
+          </table>
+        </section>
+
+        <!-- ════════════════════════════════════════════
+             §2 異動記錄
+        ════════════════════════════════════════════ -->
+        <section class="section" id="governance">
+          <h2>一、版本治理與異動記錄</h2>
+          <table class="matrix matrix-4col">
+            <thead>
+              <tr><th>日期</th><th>版本</th><th>更新人</th><th>變更說明</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>2026-05-14</td>
+                <td>v1.9</td>
+                <td>Anson + AI</td>
+                <td>PHASE 2 落地實作。Phase 1 選拔流程調整：ai-generate 每次嘗試後，失敗的草稿保留入 D1（不刪除），供 Phase 2 產業分析用；品質通過者才執行 ai-cover → ai-illustrate → 設為 published。Phase 2 新增：<code>0008_insights.sql</code> migration（insights 表）；<code>scripts/backfill-insights.mjs</code> 一次性回填腳本（呼叫 FinMind TaiwanStockNews 歷史資料，非 D1 posts；部署初期 D1 posts 尚空，故以 FinMind 回填 N 週，依 14 家企業每週取前 20 筆標題送 GPT-5.5，<code>data_source='FINMIND'</code>，寫入 D1 insights；支援 <code>--weeks=N</code> / <code>--dry-run</code>；約 56 次 AI 呼叫，費用 ~$0.15）；<code>/api/insights</code> Pages Function（支援 entity / impact / weeks 篩選）；前端 <code>/trends</code> 產業趨勢頁面（時間軸 + 公司篩選 + 影響層級 + AI 摘要卡片）；Navbar 新增「産業趨勢」連結；auto-pipeline Worker 新增每週一 00:00 UTC Cron（<code>0 0 * * 1</code>）觸發 <code>generateWeeklyInsights()</code>（查 D1 posts → GPT-5.5 → 寫 insights 表）；新增 <code>OPENAI_API_KEY</code> Worker secret。</td>
+              </tr>
+              <tr>
+                <td>2026-05-14</td>
+                <td>v1.8</td>
+                <td>Anson + AI</td>
+                <td>T-04/T-05 正式完成上線（Worker Version <code>6c1cb9f3</code>）。T-06 新增：Option A 架構——RSS 縮減至 2 個（VentureBeat + Ars Technica），新增 FinMind TaiwanStockNews 全量掃描作為「產業」分類補充資料源；14 家目標企業每日命中 ~74 筆。5.1 更新 RSS 清單；5.2 更新「產業」分類關鍵字（企業名稱取代原 IPO/layoff 等財金詞彙）；5.3 來源深度表更新；3.2 目標文字更新。FINMIND_TOKEN 已設為 Worker secret。</td>
+              </tr>
+              <tr>
+                <td>2026-05-13</td>
+                <td>v1.7</td>
+                <td>Anson + AI</td>
+                <td>新增「十三、PHASE 2 — 產業趨勢分析」章節：包含 13.1 背景與動機、13.2 展現形式決策（時間軸為主）、13.3 D1 insights 表 schema、13.4 每週一 Cron 執行架構、13.5 前端 UI 兩階段（P0 佔位 + P1 實額資料）、13.6 資料品質與永續性風險分析。觸發條件：D1 posts 累積達 200 篇。TOC 新增十三項目。</td>
+              </tr>
+              <tr>
+                <td>2026-05-13</td>
+                <td>v1.6</td>
+                <td>Anson + AI</td>
+                <td>T-04：分類精簡至 3 類（AI / 產業 / 資安），移除 科技 / 國際 / 財經金融（加刪除線保留痕跡）。T-05：備選佇列由前 3 名擴增至前 5 名。5.5 執行時序更新（~7 分鐘）。8.3 LINE 格式更新。待辦事項新增 T-04、T-05。</td>
+              </tr>
+              <tr>
+                <td>2026-05-13</td>
+                <td>v1.5</td>
+                <td>Anson + AI</td>
+                <td>文件全面 QA：修正 title/h1（22_01→22_03）、hero 版本（v1.1→v1.5）、分類數量（5→6）、T-01/T-02 狀態（待實作→已完成）、5.2 補上資安分類表、所有「5 篇」改為「6 篇」、LINE 通知格式補上資安行、子章節號碼與主章節同步（2.x→3.x / 3.x→4.x 等）。</td>
+              </tr>
+              <tr>
+                <td>2026-05-13</td>
+                <td>v1.4</td>
+                <td>Anson + AI</td>
+                <td>T-01：新增「資安」分類（Cover Style 5，優先順序插入 AI/科技 之後）。T-02：4.3 評分新增品牌加分規則＋2（NVIDIA/AMD/Intel/Microsoft/Anthropic/OpenAI/SpaceX/Google/TSMC/Amazon/OpenClaw/Broadcom）。同步更新 index.ts CATEGORIES + BRAND_BOOST_KEYWORDS + scoreItem。提案正式更正編號 22_01 → 22_03。</td>
+              </tr>
+              <tr>
+                <td>2026-05-13</td>
+                <td>v1.3</td>
+                <td>Anson + AI</td>
+                <td>新增「二、待辦事項」章節（T-01 資安分類、T-02 品牌加分、T-03 Workers Paid 評估）；後續章節編號全部後移（二→三 至 十一→十二）。</td>
+              </tr>
+              <tr>
+                <td>2026-05-13</td>
+                <td>v1.2</td>
+                <td>Anson + AI</td>
+                <td>補充十（部署 SOP 9 步驟）、十一（運維 FAQ：1101 Worker crash 修法、中文 slug 404 雙層修法）；修復 slugify CJK 保留問題（永久修法）與 ctx.waitUntil 1101 問題。</td>
+              </tr>
+              <tr>
+                <td>2026-05-13</td>
+                <td>v1.1</td>
+                <td>Anson + AI</td>
+                <td>新增六（風險 R1~R8 + Cron 每日鎖）、七（LINE 通知規格）；修正全文章節編號；實作計畫與驗收矩陣同步更新。</td>
+              </tr>
+              <tr>
+                <td>2026-05-13</td>
+                <td>v1.0</td>
+                <td>Anson + AI</td>
+                <td>初稿建立。涵蓋 RSS 來源確認、五大分類、評分邏輯、Auth 設計、去重策略、Cron 執行時序與完整實作範圍。</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- ════════════════════════════════════════════
+             §2 待辦事項
+        ════════════════════════════════════════════ -->
+        <section class="section" id="todo">
+          <h2>二、待辦事項</h2>
+          <p style="color:var(--muted);margin-top:0">本節追蹤已知的規格變更需求與待實作項目，依優先序排列。完成後移入版本記錄。</p>
+          <table class="matrix">
+            <thead>
+              <tr><th style="width:6%">#</th><th style="width:10%">優先級</th><th style="width:30%">項目</th><th>說明</th><th style="width:10%">狀態</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>T-01</td>
+                <td>高</td>
+                <td>新增「資安」分類（第六類）</td>
+                <td>資安新聞目前搶佔 AI/科技 分類配額，應自成一類：關鍵字涵蓋 vulnerability, CVE, exploit, ransomware, malware, phishing, patch, zero-day, 資安, 漏洞, 勒索, 駭客。Cover Style 風格 5。優先序：AI → 科技 → 資安 → 產業 → 國際 → 財經金融。</td>
+                <td><span style="color:#86f08b">已完成</span></td>
+              </tr>
+              <tr>
+                <td>T-02</td>
+                <td>高</td>
+                <td>5.3 評分加入品牌加分規則</td>
+                <td>文章 title 含以下品牌時額外 +2 分：NVIDIA（含輝達）、AMD、Intel、Microsoft（含微軟）、Anthropic、OpenAI、SpaceX、Google、TSMC（含台積電）、Amazon、OpenClaw、Broadcom。讓旗艦品牌的重要報導優先被選中。</td>
+                <td><span style="color:#86f08b">已完成</span></td>
+              </tr>
+              <tr>
+                <td>T-03</td>
+                <td>中</td>
+                <td>Cron 升級至 Workers Paid 方案</td>
+                <td>Free plan Cron CPU 上限 30 秒，<s>6 篇完整流程約需 14 分鐘。升至 Paid（$5/mo）可獲得 15 分鐘 CPU 上限。待 T-01 上線後評估是否必要。</s> T-04 精簡為 3 類後約需 7 分鐘，Free plan 截斷風險大幅降低。持續觀察每天 3 篇都能完整發布後，再決定是否升級。</td>
+                <td><span style="color:var(--muted)">觀察中</span></td>
+              </tr>
+              <tr>
+                <td>T-04</td>
+                <td>高</td>
+                <td>分類精簡至 3 類（AI / 產業 / 資安）</td>
+                <td>移除 科技 / 國際 / 財經金融 三個分類。分類數由 6 降為 3，執行時間由 ~14 分鐘降至 ~7 分鐘，Free plan waitUntil 截斷風險大幅降低。5.2 分類表保留舊分類並加刪除線。index.ts CATEGORIES 陣列同步調整。</td>
+                <td><span style="color:#86f08b">已完成</span></td>
+              </tr>
+              <tr>
+                <td>T-05</td>
+                <td>高</td>
+                <td>每分類候選佇列由前 3 名擴增至前 5 名</td>
+                <td>現有前 3 名備選在某些分類新聞稀少時容易全軍覆沒。改為前 5 名（主選 + 備選 1 ~ 4），遞補空間加大，提升每日發佈成功率。僅需修改 index.ts 取 topN 的常數。</td>
+                <td><span style="color:#86f08b">已完成</span></td>
+              </tr>
+              <tr>
+                <td>T-06</td>
+                <td>高</td>
+                <td>Option A：FinMind + RSS 混搭架構</td>
+                <td>RSS 來源由 7 個精簡至 2 個（VentureBeat + Ars Technica，保留英文國際科技覆蓋）。新增 FinMind <code>TaiwanStockNews</code> 全量掃描：每日 ~4,941 筆，以 14 家目標企業關鍵字過濾（台積電/鴻海/輝達/英特爾/三星/SpaceX/AMD 等），注入「產業」分類候選池。覆蓋率：TSMC 28 筆、鴻海 16 筆、Intel 7 筆、Samsung/Apple 6 筆、SpaceX 5 筆、NVIDIA 4 筆；Microsoft/Google/Amazon/Broadcom/Tesla 由 RSS 側補足。<code>FINMIND_TOKEN</code> 已設為 Worker secret。Worker Version <code>6c1cb9f3</code>。</td>
+                <td><span style="color:#86f08b">已完成</span></td>
+              </tr>
+              <tr>
+                <td>T-07</td>
+                <td>高</td>
+                <td>PHASE 2：產業趨勢 UI + 每週 Cron + 回填腳本</td>
+                <td>新增 <code>0008_insights.sql</code> migration（insights 表）。新增 <code>scripts/backfill-insights.mjs</code> 一次性回填腳本（來源：FinMind TaiwanStockNews 歷史資料，非 D1 posts；部署初期 D1 posts 尚空，先以 FinMind 歷史新聞依 14 家企業每週取前 20 筆標題送 GPT-5.5，<code>data_source='FINMIND'</code>；支援 <code>--weeks=N</code> / <code>--dry-run</code>）。新增 <code>/api/insights</code> Pages Function（支援 entity / impact / weeks 篩選）。新增前端 <code>/trends</code> 時間軸頁面（公司篩選 / 影響層級 / 展開原始標題 / AI 摘要卡片）。Navbar 加「産業趨勢」連結。auto-pipeline 新增每週一 Cron <code>0 0 * * 1</code> 觸發 <code>generateWeeklyInsights()</code>（查本週 D1 posts → GPT-5.5 摘要 → 寫 insights 表）。新增 Worker secret：<code>OPENAI_API_KEY</code>。</td>
+                <td><span style="color:#86f08b">已完成</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- ════════════════════════════════════════════
+             §3 背景與目標
+        ════════════════════════════════════════════ -->
+        <section class="section" id="background">
+          <h2>三、背景與目標</h2>
+
+          <div class="spec-block">
+            <h3>3.1 現況痛點</h3>
+            <p>Blog 已具備完整的 AI 生文、封面圖、插圖功能，但全流程仍需人工觸發：手動輸入 URL → 手動按生文 → 手動按生封面 → 手動按生插圖。每天若要持續發文，人工成本高且容易中斷。</p>
+          </div>
+
+          <div class="spec-block" style="margin-top: 16px;">
+            <h3>3.2 目標</h3>
+            <ul class="list">
+              <li><strong>Phase 1（每日）</strong>：每天早上 07:00 自動從 <strong>2 個 RSS 來源（VentureBeat + Ars Technica）</strong> 加上 <strong>FinMind TaiwanStockNews 全量掃描</strong> 收集新聞，無需人工觸發。</li>
+              <li>自動篩選並對應到 <s>6 個分類（AI / 科技 / 資安 / 產業 / 國際 / 財經金融）</s> <strong>3 個分類（AI / 產業 / 資安）</strong>，每類最多發佈一篇。</li>
+              <li>每分類逐篇嘗試 ai-generate（選拔）：<strong>失敗的草稿保留入 D1</strong>（供 Phase 2 分析）；第一篇通過品質門檻者繼續 ai-cover → ai-illustrate → 發佈（<code>status = published</code>）。</li>
+              <li><strong>不影響現有後台操作方式</strong>，管理員仍可手動使用 AiGeneratePage 生成任意文章。</li>
+              <li><strong>Phase 2（每週）</strong>：每週一自動讀取 D1 posts（含草稿與已發佈），依 14 家目標企業分組疊加 title + excerpt，以 GPT-5.5 生成產業趨勢洞察，持久化入 <code>insights</code> 表，形成可回溯的知識庫。</li>
+              <li>前端 <code>/trends</code> 頁面以時間軸呈現 insights，可按公司 / 影響層級 / 時間範圍篩選。</li>
+              <li><strong>部署初期一次性回填（Phase 0）</strong>：Phase 1 剛上線時 D1 posts 幾乎是空的，若此時直接啟動 Phase 2 Cron 將得到 0 筆分析素材。因此在 Phase 2 正式啟動前，需執行一次性本機腳本 <code>scripts/backfill-insights.mjs --weeks=4</code>，<strong>繞過 D1 posts、改呼叫 FinMind TaiwanStockNews 歷史 API</strong>，取得過去 N 週 14 家企業的真實新聞標題，每家每週取前 20 筆送 GPT-5.5 生成趨勢洞察，以 <code>data_source='FINMIND'</code> 寫入 D1 insights 表。此回填完成後，/trends 頁面上線當天即有歷史縱深資料可顯示；後續每週 Cron 改以 <code>data_source='D1_POSTS'</code> 持續累積。此作業為<strong>一次性手動步驟，不重複執行</strong>，費用約 $0.15（~56 次 GPT-5.5 呼叫）。</li>
+            </ul>
+          </div>
+
+          <div class="spec-block" style="margin-top: 16px;">
+            <h3>3.3 設計原則</h3>
+            <ul class="list">
+              <li><strong>最小侵入</strong>：現有三個 AI endpoint 不改對外行為，pipeline 只新增一條呼叫路徑。</li>
+              <li><strong>Auth 隔離</strong>：Pipeline 使用獨立 <code>PIPELINE_SECRET</code> 認證，不與管理員 session 混用。</li>
+              <li><strong>失敗不阻塞</strong>：單篇失敗直接跳過，不重試，保證 Cron 在 15 分鐘內完成。</li>
+              <li><strong>備選不斷供</strong>：每分類預選前 <s>3</s> <strong>5</strong> 名，主選失敗依序遞補。</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- ════════════════════════════════════════════
+             §4 架構決策
+        ════════════════════════════════════════════ -->
+        <section class="section" id="architecture">
+          <h2>四、架構決策</h2>
+
+          <div class="spec-block">
+            <h3>4.1 整體流程</h3>
+            <p><strong>Phase 0 — 部署後一次性手動回填（<code>node scripts/backfill-insights.mjs --weeks=4</code>）</strong></p>
+            <div class="callout" style="margin-bottom:10px">
+              <strong>為何需要 Phase 0？</strong> Phase 2 週報 Cron 讀取的是 D1 posts 表，但 Phase 1 剛上線時 D1 posts 幾乎是空的（才開始每天自動發文），若直接等 Phase 2 Cron 自然產生 insights，/trends 頁面將在數週內毫無資料，用戶體驗極差。Phase 0 解決這個冷啟動問題：部署完成當天執行一次，以 FinMind 歷史資料預填過去 N 週的 insights，讓 /trends 頁面<strong>上線首日即有內容</strong>。此作業不重複執行。
+            </div>
+            <div class="flow">
+              <div class="flow-step">手動執行<br><small>本機 Node.js</small></div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-step">計算過去 N 週<br>日期範圍</div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-step">按月分塊呼叫<br>FinMind API</div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-step">依 14 家企業<br>× ISO 週分組</div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-step">每組取前 20 筆<br>新聞標題</div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-step">GPT-5.5<br>生成趨勢洞察</div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-step">產生 INSERT SQL</div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-step">wrangler d1 execute<br>BLOG_DB --remote</div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-step">D1 insights 表<br><code>data_source='FINMIND'</code></div>
+            </div>
+            <table class="kv" style="margin-top:12px">
+              <tr><th>觸發方式</th><td>一次性手動執行（部署 Step 14）。不會再次觸發，除非 insights 表遭清空需重建。</td></tr>
+              <tr><th>資料來源</th><td>FinMind TaiwanStockNews（歷史），<strong>非</strong> D1 posts（D1 posts 此時尚空）</td></tr>
+              <tr><th>寫入標記</th><td><code>data_source = 'FINMIND'</code>，與 Phase 2 Cron 的 <code>'D1_POSTS'</code> 可區分</td></tr>
+              <tr><th>規模</th><td>預設 4 週 × 14 家企業 = ~56 組，每組 1 次 GPT-5.5 呼叫，費用 ~$0.15，耗時 &lt; 2 分鐘</td></tr>
+              <tr><th>冪等保護</th><td>SQL 使用 <code>INSERT OR IGNORE</code>，重複執行不會產生重複資料</td></tr>
+              <tr><th>支援參數</th><td><code>--weeks=N</code>（調整回填週數）、<code>--dry-run</code>（只印摘要，不呼叫 OpenAI 也不寫 D1）</td></tr>
+            </table>
+
+            <p style="margin-top:20px"><strong>Phase 1 — 每日 07:00（Cron: <code>0 23 * * *</code>）</strong></p>
+            <div class="flow">
+              <div class="flow-step">Cron 07:00</div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-step">Fetch 2 RSS + FinMind</div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-step">分類 + 評分</div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-step">去重過濾</div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-step">ai-generate × N（選拔，失敗草稿保留 D1）</div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-step">ai-cover × 3（最佳者）</div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-step">ai-illustrate × 3</div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-step">D1 UPDATE published</div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-step">LINE 通知</div>
+            </div>
+            <p style="margin-top: 12px;"><strong>Phase 2 — 每週一 08:00（Cron: <code>0 0 * * 1</code>）</strong></p>
+            <div class="flow">
+              <div class="flow-step">Cron 週一 08:00</div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-step">查 D1 posts（本週，含草稿）</div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-step">依企業關鍵字分組</div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-step">疊加 title + excerpt</div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-step">GPT-5.5 生成趨勢洞察</div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-step">寫入 D1 insights</div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-step">LINE 週報通知</div>
+            </div>
+            <p style="margin-top: 12px;">Phase 1 全程在單一 Cron Worker 內依序執行，預計耗時 <s>~14 分鐘</s> <strong>~7 分鐘</strong>，在 Cloudflare Unbound 模式 15 分鐘上限內。Phase 2 週報每家企業有 500ms 間隔（GPT rate-limit），預計 14 家 × 2s ≈ 30 秒。</p>
+          </div>
+
+          <div class="spec-block" style="margin-top: 16px;">
+            <h3>4.2 為何選 Cron Worker 而非多個 Cron</h3>
+            <p>每篇耗時約 2.3 分鐘（生文 ~25s + 封面 ~50s + 插圖 ~50s），<s>6 篇合計約 14 分鐘</s> <strong>3 篇合計約 7 分鐘</strong>。單一 Cron 在 Unbound 模式下可完整執行，不需要 KV 協調多個 Cron 的執行序，實作最簡單且最可靠。</p>
+          </div>
+
+          <div class="spec-block" style="margin-top: 16px;">
+            <h3>4.3 Auth 設計：不影響現有後台</h3>
+            <p>現有 <code>requireAdmin</code> 只接受管理員 session cookie。Pipeline Cron Worker 無法持有 session，因此新增一個獨立的 fallback 認證路徑：</p>
+            <pre>// _auth.ts 修改（唯一需要動的現有程式）
+export async function requireAdmin(request, env) {
+  // 原有 session 驗證邏輯不變
+  const sessionOk = await checkSession(request, env);
+  if (sessionOk) return null;
+
+  // 新增：Pipeline Secret fallback（僅供 Cron Worker 使用）
+  const authHeader = request.headers.get("Authorization") ?? "";
+  if (authHeader === `Bearer ${env.PIPELINE_SECRET}`) return null;
+
+  return json({ error: "Unauthorized" }, 401);
+}</pre>
+            <div class="callout">
+              <strong>隔離保證：</strong> <code>PIPELINE_SECRET</code> 只存在 Cloudflare 環境變數中，不出現在任何程式碼或 git history。管理員後台的 session 認證路徑完全不受影響。
+            </div>
+          </div>
+
+          <div class="spec-block" style="margin-top: 16px;">
+            <h3>4.4 翻譯策略：讓現有系統處理</h3>
+            <p>所有英文來源（VentureBeat、Ars Technica）不需要額外翻譯步驟。<code>ai-generate</code> 接收 URL 後透過 <code>r.jina.ai</code> 抓取全文，再由 GPT 直接輸出繁體中文，翻譯已內建在現有流程中。Pipeline 只需把文章 URL 傳入即可。</p>
+          </div>
+        </section>
+
+        <!-- ════════════════════════════════════════════
+             §5 系統設計規格
+        ════════════════════════════════════════════ -->
+        <section class="section" id="spec">
+          <h2>五、系統設計規格</h2>
+
+          <!-- 5.1 RSS 來源 -->
+          <div class="spec-block">
+            <h3>5.1 資料來源（已上線，Option A 混搭架構）</h3>
+            <p style="color:var(--muted);margin-top:0">Phase 1（每日發文）與 Phase 2（週報 insights）的資料來源不同：</p>
+
+            <h4 style="margin-top:14px;font-size:.9rem;color:var(--accent)">Phase 1 — 每日文章生成來源</h4>
+            <table class="matrix">
+              <thead>
+                <tr><th>來源</th><th>語言</th><th>說明 / API</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>VentureBeat</strong></td><td>English</td><td><code>https://venturebeat.com/feed/</code>（Depth 2）— AI / 産業 / 資安 三類均可命中，主力 RSS 來源</td></tr>
+                <tr><td><strong>Ars Technica</strong></td><td>English</td><td><code>https://feeds.arstechnica.com/arstechnica/index</code>（Depth 1）— 資安 / AI / 産業 補充覆蓋</td></tr>
+                <tr style="background:rgba(134,240,139,.06)"><td><strong>FinMind TaiwanStockNews</strong></td><td>zh-TW</td><td><code>api.finmindtrade.com/api/v4/data</code> — 每日全量抓取（~4,941 筆），以 14 家企業關鍵字過濾後注入「産業」分類候選池</td></tr>
+              </tbody>
+            </table>
+            <div class="callout" style="margin-top: 12px;">
+              <strong>FinMind 每日覆蓋率參考：</strong> TSMC ~28 筆、鴻海 ~16 筆、Intel ~7 筆、Samsung/Apple ~6 筆、SpaceX ~5 筆、NVIDIA ~4 筆；Microsoft/Google/Amazon/Broadcom/Tesla 由 VentureBeat RSS 側補足。
+            </div>
+
+            <h4 style="margin-top:20px;font-size:.9rem;color:var(--accent)">Phase 2 — 産業趨勢 insights 來源</h4>
+            <table class="matrix">
+              <thead>
+                <tr><th>來源</th><th>情境</th><th>說明</th></tr>
+              </thead>
+              <tbody>
+                <tr style="background:rgba(134,240,139,.06)">
+                  <td><strong>FinMind TaiwanStockNews</strong></td>
+                  <td>一次性回填（<code>backfill-insights.mjs</code>）</td>
+                  <td>部署初期 D1 posts 尚空，先用 FinMind 歷史資料（預設 4 週）回填 insights 表，確保 /trends 頁面有內容。每家企業每週取前 20 筆標題送 GPT-5.5 分析，約 56 次 AI 呼叫，費用 ~$0.15。</td>
+                </tr>
+                <tr>
+                  <td><strong>D1 posts 表</strong></td>
+                  <td>每週例行 Cron（<code>generateWeeklyInsights()</code>）</td>
+                  <td>Phase 1 每日發文後，D1 posts 逐漸累積。每週一 Cron 掃描本週 published/draft 文章，以企業關鍵字比對，命中者送 GPT-5.5 生成 insights。長期來源，不依賴外部 API。</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="callout warn" style="margin-top: 8px;">
+              <strong>舊 RSS 來源（已移除）：</strong> TechNews 科技新報、iThome、TechOrange、TechCrunch、MIT Technology Review — 已於 v1.8 精簡，不再使用。中文財經媒體 RSS（ctee、money.udn 等）RSS 封鎖，無法抓取。
+            </div>
+          </div>
+
+          <!-- 5.2 六大分類定義 -->
+          <div class="spec-block" style="margin-top: 16px;">
+            <h3>5.2 分類定義與關鍵字規則（現行 3 類 + 3 類停用）</h3>
+            <p>Phase A：RSS 收集後用 title 關鍵字做初步分類（純字串，不需 AI）。Phase C：ai-generate 生文後用 <code>suggested_category</code> 修正最終發佈分類標籤。</p>
+            <table class="matrix">
+              <thead>
+                <tr><th>分類</th><th>Cover Style</th><th>分類關鍵字（含中英）</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>AI</strong></td>
+                  <td>風格 4 知識卡片</td>
+                  <td>AI, GPT, LLM, Claude, Gemini, OpenAI, Anthropic, 人工智慧, 大模型, 生成式, agent, 機器學習, Codex, Copilot</td>
+                </tr>
+                <tr style="opacity:0.45;text-decoration:line-through">
+                  <td><strong>科技</strong></td>
+                  <td>風格 1 商業簡報</td>
+                  <td>chip, semiconductor, Apple, Google, Samsung, 晶片, 半導體, 5G, 量子, 硬體, CPU, GPU, smartphone</td>
+                </tr>
+                <tr style="background:rgba(134,240,139,.06)">
+                  <td><strong>資安</strong> <span style="color:#f0c86b;font-size:.85em">★ NEW</span></td>
+                  <td>風格 5 深色科技</td>
+                  <td>vulnerability, CVE, exploit, ransomware, malware, phishing, patch, zero-day, zero day, breach, cyberattack, 資安, 漏洞, 勒索, 駭客, 入侵</td>
+                </tr>
+                <tr>
+                  <td><strong>產業</strong> <span style="color:#f0c86b;font-size:.85em">★ 更新</span></td>
+                  <td>風格 2 新聞封面</td>
+                  <td>台積電, TSMC, 鴻海, Foxconn, 輝達, NVIDIA, 英特爾, Intel, 三星, Samsung, SpaceX, AMD, 蘋果, Apple, Meta, Tesla, 特斯拉, Microsoft, 微軟, Google, Amazon, 亞馬遜, Broadcom, 博通, semiconductor, 晶片, 半導體</td>
+                </tr>
+                <tr style="opacity:0.45;text-decoration:line-through">
+                  <td><strong>國際</strong></td>
+                  <td>風格 6 報紙頭版</td>
+                  <td>tariff, sanction, trade, policy, regulation, geopolit, 關稅, 制裁, 貿易, 法規, 地緣, 政策</td>
+                </tr>
+                <tr style="opacity:0.45;text-decoration:line-through">
+                  <td><strong>財經金融</strong></td>
+                  <td>風格 3 交易員面板</td>
+                  <td>stock, ETF, Fed, interest rate, GDP, 股市, 利率, 財報, 央行, 匯率, 台股, 指數</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="callout" style="margin-top: 12px;">
+              <strong>優先順序規則：</strong> 一篇文章同時命中多個分類時，依 <s>AI → 科技 → 資安 → 產業 → 國際 → 財經金融</s> <strong>AI → 產業 → 資安</strong> 順序取第一個命中的分類。避免同一篇文章被計入多個分類候選池。
+            </div>
+          </div>
+
+          <!-- 5.3 評分選篇 -->
+          <div class="spec-block" style="margin-top: 16px;">
+            <h3>5.3 評分邏輯與選篇機制</h3>
+            <p>每個分類的所有候選文章依以下規則計分，取前 <s>3 名作為備選佇列（主選 + 備選 1 + 備選 2）</s> <strong>5 名作為備選佇列（主選 + 備選 1 ~ 4）</strong>：</p>
+            <table class="matrix">
+              <thead>
+                <tr><th>因子</th><th>條件</th><th>分數</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>新鮮度（高）</td><td>發布時間距今 ≤ 6 小時</td><td>+3</td></tr>
+                <tr><td>新鮮度（低）</td><td>發布時間距今 ≤ 24 小時</td><td>+1</td></tr>
+                <tr><td>來源深度（高）</td><td>VentureBeat</td><td>+2</td></tr>
+                <tr><td>來源深度（中）</td><td>Ars Technica / FinMind</td><td>+1</td></tr>
+                <tr><td>摘要豐富度</td><td>RSS description 長度 ≥ 100 字元</td><td>+1</td></tr>
+                <tr><td>關鍵字命中</td><td>title 含分類核心關鍵字</td><td>+1</td></tr>
+                <tr style="background:rgba(134,240,139,.08)">
+                  <td><strong>品牌加分</strong> <span style="color:#f0c86b;font-size:.85em">★ NEW</span></td>
+                  <td>title 含：NVIDIA/輝達、AMD、Intel、Microsoft/微軟、Anthropic、OpenAI、SpaceX、Google、TSMC/台積電、Amazon、OpenClaw、Broadcom</td>
+                  <td><strong>+2</strong></td>
+                </tr>
+              </tbody>
+            </table>
+            <p style="margin-top: 12px;">同分時優先取 <code>pubDate</code> 較新者。分數計算在記憶體內完成，不需額外 AI 呼叫。</p>
+          </div>
+
+          <!-- 5.4 去重策略 -->
+          <div class="spec-block" style="margin-top: 16px;">
+            <h3>5.4 兩層去重策略</h3>
+            <div class="grid-2">
+              <div class="note">
+                <h3>Layer 1：Hard Dedup（跨天）</h3>
+                <ul class="list">
+                  <li>儲存：Cloudflare KV，namespace <code>PIPELINE_DEDUP</code></li>
+                  <li>Key：<code>url:{sha256(article_url)}</code></li>
+                  <li>TTL：30 天自動清除</li>
+                  <li>時機：每篇文章送入 ai-generate 前先查 KV；成功發佈後寫入 KV</li>
+                  <li>效果：同一篇文章 30 天內不會被重複發佈</li>
+                </ul>
+              </div>
+              <div class="note">
+                <h3>Layer 2：Soft Dedup（批次內）</h3>
+                <ul class="list">
+                  <li>儲存：當次 Cron 記憶體，不持久化</li>
+                  <li>方法：同分類候選佇列中，比對 title 關鍵字重疊率；同批次已選文章的 title tokens 集合中，若新文章重疊超過 60% 則排除</li>
+                  <li>效果：同一天不會有主題高度重複的兩篇文章</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- 5.5 執行時序 -->
+          <div class="spec-block" style="margin-top: 16px;">
+            <h3>5.5 Cron 執行時序</h3>
+            <p><strong>Phase 1 — 每日 07:00 UTC+8（Cron: <code>0 23 * * *</code>）</strong></p>
+            <pre>07:00:00  Cron Worker 啟動
+07:00:05  並行 fetch 2 個 RSS + FinMind API（Promise.all，逾時 10s 各自跳過）
+07:00:15  分類 + 評分 + 去重 + 排序，建立每類前 5 名備選佇列
+07:00:20  ── 開始逐篇處理（分類順序：AI → 産業 → 資安）──
+
+          每分類選拔流程：
+            ① 呼叫 ai-generate（存草稿 draft 至 D1）
+            ② 品質檢查（title 非空 + content ≥ 500 字）
+            ③ 通過 → 進入發佈流程；失敗 → 草稿留 D1，嘗試下一候選
+
+          篇 1（最佳者）：
+07:00:20    ai-generate (url)          → 草稿寫入 D1  ~25s
+07:00:45    ai-cover (post_id, style)  → cover image  ~50s
+07:01:35    ai-illustrate (post_id)    → illustration ~50s
+07:02:25    D1 UPDATE status='published'
+          篇 2：~07:02:30 開始，~07:04:40 完成
+          篇 3：~07:04:45 開始，~07:06:55 完成
+
+07:06:57  全部分類處理完成
+07:06:59  sendLine() 推送執行摘要到手機
+07:07:02  Cron 結束，總耗時 ~7 分鐘（Free plan 上限 15 分鐘，剩餘 ~8 分鐘緩衝）</pre>
+            <p style="margin-top:12px"><strong>Phase 2 — 每週一 08:00 UTC+8（Cron: <code>0 0 * * 1</code>）</strong></p>
+            <pre>08:00:00  Cron Worker 啟動（if event.cron === "0 0 * * 1"）
+08:00:02  計算本 ISO 週的 week_start（週一日期）
+08:00:03  查詢 D1 posts WHERE created_at >= week_start（含草稿 + 發佈）
+08:00:05  依 14 家企業關鍵字分組，疊加每家 title + excerpt
+08:00:06  開始逐公司呼叫 GPT-5.5（每家 500ms 間隔）
+            → GPT-5.5 生成趨勢洞察（≤ 150 字）
+            → INSERT INTO insights (week_start, entity, ...)  -- 不覆蓋已有資料
+08:00:35  14 家企業全部完成（約 30s）
+08:00:36  sendLine() 推送「週報已更新 N 家企業動向」
+08:00:37  Cron 結束</pre>
+            <div class="callout warn" style="margin-top: 12px;">
+              <strong>備選觸發：</strong> Phase 1 每分類最多嘗試 5 個候選，每個候選先跑 ai-generate（草稿保留）。第一個品質通過者才繼續 ai-cover + ai-illustrate + 發佈；其他草稿留 D1 供 Phase 2 分析。若 5 選全失敗，該分類當天跳過。
+            </div>
+          </div>
+
+          <!-- 5.6 資料寫入 -->
+          <div class="spec-block" style="margin-top: 16px;">
+            <h3>5.6 D1 資料寫入規格</h3>
+            <p>每篇文章的發佈記錄與現有手動發佈格式完全一致，直接寫入 <code>posts</code> 表：</p>
+            <table class="kv">
+              <tr><th>欄位</th><td>來源</td></tr>
+              <tr><th>title</th><td>ai-generate 回傳 <code>title</code></td></tr>
+              <tr><th>excerpt</th><td>ai-generate 回傳 <code>excerpt</code></td></tr>
+              <tr><th>content_html</th><td>ai-generate 回傳 <code>content_html</code></td></tr>
+              <tr><th>cover_image_url</th><td>ai-cover 回傳圖片路徑（R2 代理路徑）</td></tr>
+              <tr><th>category</th><td>ai-generate 回傳 <code>suggested_category</code>（Phase C 修正後的標籤）</td></tr>
+              <tr><th>tags</th><td>ai-generate 回傳 <code>suggested_tags</code></td></tr>
+              <tr><th>status</th><td>Phase 1 品質通過者：<code>published</code>；品質未通過者：保留 <code>draft</code>，供 Phase 2 每週 insights 分析使用</td></tr>
+              <tr><th>source_url</th><td>原始 RSS 文章 URL（追溯用）</td></tr>
+              <tr><th>pipeline_run</th><td>本次 Cron 啟動時間戳（批次追蹤用）</td></tr>
+            </table>
+          </div>
+        </section>
+
+        <!-- ════════════════════════════════════════════
+             §6 實作範圍
+        ════════════════════════════════════════════ -->
+        <section class="section" id="impl">
+          <h2>六、實作範圍</h2>
+
+          <div class="spec-block">
+            <h3>6.1 新增檔案</h3>
+            <table class="matrix">
+              <thead>
+                <tr><th>檔案路徑</th><th>類型</th><th>說明</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>workers/auto-pipeline/index.ts</code></td>
+                  <td>新增</td>
+                  <td>Cron Worker 主體。Phase 1：RSS + FinMind fetch、分類評分、去重、逐篇 ai-generate（草稿保留）→ 最佳者 ai-cover → ai-illustrate → 發佈。Phase 2：每週一查 D1 posts → GPT-5.5 摘要 → 寫 insights。雙 Cron：<code>0 23 * * *</code>（日報）+ <code>0 0 * * 1</code>（週報）。</td>
+                </tr>
+                <tr>
+                  <td><code>workers/auto-pipeline/wrangler.toml</code></td>
+                  <td>新增</td>
+                  <td>Worker 設定檔。Bindings：D1、KV（PIPELINE_DEDUP）。Secrets：PIPELINE_SECRET、LINE_CHANNEL_ACCESS_TOKEN、FINMIND_TOKEN、OPENAI_API_KEY。Crons：<code>["0 23 * * *", "0 0 * * 1"]</code>。</td>
+                </tr>
+                <tr style="background:rgba(134,240,139,.06)">
+                  <td><code>src/web/migrations/0008_insights.sql</code></td>
+                  <td>新增</td>
+                  <td>D1 migration：建立 <code>insights</code> 表（week_start / entity / entity_group / hit_count / direction / key_events / impact / data_source / model_ver / prompt_ver / created_at）及索引。</td>
+                </tr>
+                <tr style="background:rgba(134,240,139,.06)">
+                  <td><code>scripts/backfill-insights.mjs</code></td>
+                  <td>新增</td>
+                  <td>一次性本機回填腳本（Node.js）。<strong>資料來源：FinMind TaiwanStockNews 歷史資料（非 D1 posts）</strong>。原因：部署初期 D1 posts 表尚空，無法提供 Phase 2 分析素材，故直接呼叫 FinMind API 取得各企業歷史新聞標題，依 ISO 週 × 14 家企業分組，每家每週取前 20 筆標題送 GPT-5.5，生成 <code>data_source='FINMIND'</code> 的 insights 並寫入 D1。支援 <code>--weeks=N</code>（預設 4）、<code>--dry-run</code>。生成 SQL 後執行 <code>wrangler d1 execute BLOG_DB --remote</code>。</td>
+                </tr>
+                <tr style="background:rgba(134,240,139,.06)">
+                  <td><code>functions/api/insights.ts</code></td>
+                  <td>新增</td>
+                  <td>Cloudflare Pages Function。<code>GET /api/insights</code>：查 D1 insights 表，支援 <code>weeks</code>（預設 16）、<code>entity</code>、<code>impact</code> 查詢參數，回傳 <code>{ insights, entities, meta }</code>。</td>
+                </tr>
+                <tr style="background:rgba(134,240,139,.06)">
+                  <td><code>src/pages/TrendsPage.tsx</code></td>
+                  <td>新增</td>
+                  <td>前端產業趨勢頁（<code>/trends</code>）。時間軸依 week_start 降序，InsightCard 顯示企業名 + 影響層級 + AI 摘要 + 可展開的原始新聞標題清單。篩選：近 4/8/16 週、公司、高/中/低影響。</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="spec-block" style="margin-top: 16px;">
+            <h3>6.2 修改檔案</h3>
+            <table class="matrix">
+              <thead>
+                <tr><th>檔案路徑</th><th>類型</th><th>說明</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>functions/api/admin/_auth.ts</code></td>
+                  <td>修改</td>
+                  <td><code>requireAdmin</code> 新增 <code>PIPELINE_SECRET</code> Bearer fallback。原有 session 驗證邏輯不動。</td>
+                </tr>
+                <tr style="background:rgba(134,240,139,.06)">
+                  <td><code>src/lib/api.ts</code></td>
+                  <td>修改</td>
+                  <td>新增 <code>Insight</code> / <code>InsightsResponse</code> 介面；新增 <code>getInsights(params)</code> 函式呼叫 <code>/api/insights</code>。</td>
+                </tr>
+                <tr style="background:rgba(134,240,139,.06)">
+                  <td><code>src/App.tsx</code></td>
+                  <td>修改</td>
+                  <td>新增 <code>import TrendsPage</code> 及 <code>&lt;Route path="/trends" element={&lt;TrendsPage /&gt;} /&gt;</code>。</td>
+                </tr>
+                <tr style="background:rgba(134,240,139,.06)">
+                  <td><code>src/components/Navbar.tsx</code></td>
+                  <td>修改</td>
+                  <td>桌面版 nav 和 mobile drawer 均新增「産業趨勢」連結（<code>/trends</code>，hover 色 <code>var(--green)</code>）。</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="spec-block" style="margin-top: 16px;">
+            <h3>6.3 新增 Cloudflare 資源（Dashboard 操作）</h3>
+            <ul class="list">
+              <li><strong>KV Namespace</strong>：<code>PIPELINE_DEDUP</code>，用於去重狀態儲存 + 每日執行鎖。</li>
+              <li><strong>Secret (Pages 與 Worker)</strong>：<code>PIPELINE_SECRET</code>（任意隨機字串，32 位以上）— 需分別在 Pages Settings 及 Worker Secrets 兩處各設定一次。</li>
+              <li><strong>Secret (Worker)</strong>：<code>LINE_CHANNEL_ACCESS_TOKEN</code> — 從 <code>~/.openclaw/line-token.json</code> 複製 <code>channelAccessToken</code>。</li>
+              <li><strong>Secret (Worker)</strong>：<code>FINMIND_TOKEN</code> — FinMind API JWT token，已設定。</li>
+              <li><strong>Secret (Worker)</strong>：<code>OPENAI_API_KEY</code> — OpenAI API key，用於 Phase 2 週報 GPT-5.5 呼叫。</li>
+              <li><strong>Var (Worker)</strong>：<code>LINE_USER_ID</code> = <code>U58f2e37ee1ccebb07d8f437c4fa5f976</code></li>
+              <li><strong>D1 Migration</strong>：執行 <code>npx wrangler d1 migrations apply BLOG_DB --remote</code> 套用 <code>0008_insights.sql</code>。</li>
+            </ul>
+          </div>
+
+          <div class="spec-block" style="margin-top: 16px;">
+            <h3>6.4 不需修改的部分</h3>
+            <ul class="list">
+              <li><code>functions/api/admin/ai-generate.ts</code> — 對外行為不變。</li>
+              <li><code>functions/api/admin/ai-cover.ts</code> — 對外行為不變。</li>
+              <li><code>functions/api/admin/ai-illustrate.ts</code> — 對外行為不變。</li>
+              <li>D1 schema — 僅新增兩個選填欄位 <code>source_url</code> 和 <code>pipeline_run</code>，若 schema 不支援選填則寫入時略過這兩欄。</li>
+              <li>前台（blog.buclaw.org）— 無任何改動，自動發佈的文章與手動發佈的文章格式完全相同。</li>
+              <li>管理後台 AiGeneratePage.tsx — 手動生文流程完全不受影響。</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- ════════════════════════════════════════════
+             §6 風險與防呆機制
+        ════════════════════════════════════════════ -->
+        <section class="section" id="risks">
+          <h2>七、風險與防呆機制</h2>
+
+          <div class="spec-block">
+            <h3>7.1 系統風險與處理方式</h3>
+            <table class="matrix">
+              <thead>
+                <tr><th>#</th><th>風險描述</th><th>防呆機制</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="badge">R1</span></td>
+                  <td>Cron 重複觸發（Cloudflare 偶發重試）</td>
+                  <td>每日執行鎖：Cron 啟動時先寫入 KV <code>lock:YYYYMMDD</code>；若 key 已存在則立即終止。</td>
+                </tr>
+                <tr>
+                  <td><span class="badge">R2</span></td>
+                  <td>OpenAI 費用失控</td>
+                  <td>Phase 1：每次 Cron 硬限 3 篇（每分類 1 篇）。Phase 2：週報每家企業 1 次 GPT-5.5 呼叫，最多 14 次/週，費用可控。</td>
+                </tr>
+                <tr>
+                  <td><span class="badge">R3</span></td>
+                  <td>生文內容空白或垃圾</td>
+                  <td>Sanity check：title 非空 + <code>content_html</code> ≥ 500 字元；否則視為失敗並自動嘗試備選。</td>
+                </tr>
+                <tr>
+                  <td><span class="badge">R4</span></td>
+                  <td>D1 寫入部分成功（中途異常）</td>
+                  <td>每篇獨立 <code>try/catch</code>，失敗只跳過該篇，不中斷其他篇。不做 rollback。</td>
+                </tr>
+                <tr>
+                  <td><span class="badge">R5</span></td>
+                  <td>0 篇發布（所有分類全部失敗）</td>
+                  <td>發布篇數為 0 時，透過 LINE 發送告警訊息：「0 篇發布，請手動檢查 RSS 來源。」</td>
+                </tr>
+                <tr>
+                  <td><span class="badge">R6</span></td>
+                  <td>RSS 來源暫時不可用</td>
+                  <td><code>Promise.all</code> + 10s timeout，單源失敗不阻塞其他來源，當天以剩餘來源繼續執行。</td>
+                </tr>
+                <tr>
+                  <td><span class="badge">R7</span></td>
+                  <td>ai-illustrate 失敗（文章無插圖）</td>
+                  <td>可接受降級：文章仍以無插圖狀態發布，不跳過整篇。</td>
+                </tr>
+                <tr style="opacity:0.6">
+                  <td><span class="badge warn">R8</span></td>
+                  <td><s>財經金融分類長期無文章</s></td>
+                  <td>已於 v1.6（T-04）移除財經金融分類，不適用。</td>
+                </tr>
+                <tr>
+                  <td><span class="badge">R9</span></td>
+                  <td>Phase 2 週報：本週 D1 posts 為空</td>
+                  <td>若當週 Phase 1 全部失敗（0 篇草稿），<code>generateWeeklyInsights()</code> 查無資料時直接跳過，LINE 推送告警「本週無新文章，insights 跳過」，不寫入空 insights row。</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="spec-block" style="margin-top: 16px;">
+            <h3>7.2 Cron 執行鎖詳細規格</h3>
+            <p>Idempotency key 設計，防止 Cloudflare 對同一天重複觸發：</p>
+            <pre>// index.ts - scheduled() 套件選項首行
+export default {
+  async scheduled(event, env, ctx) {
+    const today = new Date().toISOString().slice(0, 10); // "2026-05-13"
+    const lockKey = `lock:${today}`;
+    const existing = await env.PIPELINE_DEDUP.get(lockKey);
+    if (existing) {
+      console.log(`[pipeline] already ran today (${today}), skipping.`);
+      return;
+    }
+    // 寫入鎖（TTL 26 小時）
+    await env.PIPELINE_DEDUP.put(lockKey, "1", { expirationTtl: 93600 });
+    // ... 進入主流程
+  }
+};</pre>
+          </div>
+        </section>
+
+        <!-- ════════════════════════════════════════════
+             §7 LINE 通知規格
+        ════════════════════════════════════════════ -->
+        <section class="section" id="notification">
+          <h2>八、LINE 通知規格</h2>
+
+          <div class="spec-block">
+            <h3>8.1 機制說明</h3>
+            <p>OpenClaw CLI 底層即是呼叫 <code>api.line.me/v2/bot/message/push</code>。Cloudflare Worker 用 <code>fetch()</code> 直接呼叫相同 API，不需要安裝 openclaw CLI（CLI 無法在 Cloudflare 執行）。</p>
+            <table class="kv" style="margin-top: 12px;">
+              <tr><th>Cloudflare Secret</th><td><code>LINE_CHANNEL_ACCESS_TOKEN</code> — 從 <code>~/.openclaw/line-token.json</code> 複製 <code>channelAccessToken</code> 的字串，存入 Worker Secret</td></tr>
+              <tr><th>Cloudflare Var</th><td><code>LINE_USER_ID</code> = <code>U58f2e37ee1ccebb07d8f437c4fa5f976</code>（已驗證，就是現在 OpenClaw 使用的接收端）</td></tr>
+            </table>
+          </div>
+
+          <div class="spec-block" style="margin-top: 16px;">
+            <h3>8.2 通知時機與內容機制</h3>
+            <table class="matrix">
+              <thead>
+                <tr><th>時機</th><th>觸發條件</th><th>訊息格式</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>執行完成</td>
+                  <td>Cron 結束，對每個分類都已處理完畢（不論成功或跳過）</td>
+                  <td>完成摘要（見式 7.3）</td>
+                </tr>
+                <tr>
+                  <td>個分類全部備選皆失敗</td>
+                  <td>5 選全部嘗試失敗，分類跳過</td>
+                  <td>「⚠️ [Blog Pipeline] {category} 分類跳過，5 選全失敗：{reason}」</td>
+                </tr>
+                <tr>
+                  <td>0 篇告警</td>
+                  <td>發布篇數 = 0</td>
+                  <td>「❌ [Blog Pipeline] {date} 0 篇發布，請手動檢查 RSS 來源」</td>
+                </tr>
+                <tr>
+                  <td>Cron 鎖抓到（重複觸發）</td>
+                  <td>KV 鎖已存在</td>
+                  <td>不發通知，只寫 console.log</td>
+                </tr>
+                <tr style="background:rgba(134,240,139,.06)">
+                  <td>Phase 2 週報完成</td>
+                  <td>每週一 generateWeeklyInsights() 執行完畢</td>
+                  <td>「[Blog 産業趨勢] {week_start} 週報完成，已更新 N 家企業動向，失敗 M 筆。」</td>
+                </tr>
+                <tr style="background:rgba(134,240,139,.06)">
+                  <td>Phase 2 本週無資料</td>
+                  <td>D1 posts 本週 0 筆</td>
+                  <td>「⚠️ [Blog 産業趨勢] {week_start} 本週無新文章，insights 生成跳過。」</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="spec-block" style="margin-top: 16px;">
+            <h3>8.3 執行完成通知格式</h3>
+            <pre><s>成功 6 篇：</s> 成功 3 篇：
+[Blog Pipeline] 2026-05-13 完成
+✅ 發布 3 篇
+- AI: 「...文章標題...」
+<s>- 科技: 「...文章標題...」</s>
+- 資安: 「...文章標題...」
+- 產業: 「...文章標題...」
+<s>- 國際: 「...文章標題...」
+- 財經金融: 「...文章標題...」</s>
+————————————————————
+部分失敗：
+[Blog Pipeline] 2026-05-13 完成（部分失敗）
+✅ 發布 2 篇  ⚠️ 跳過 1 篇
+- AI: 「...」
+<s>- 科技: 「...」</s>
+- 資安: 「...」
+- 產業: ⚠️ 跳過（5 選全失敗）
+<s>- 國際: 「...」
+- 財經金融: ⚠️ 跳過（無匹配文章）</s></pre>
+          </div>
+
+          <div class="spec-block" style="margin-top: 16px;">
+            <h3>8.4 LINE API 呼叫範例</h3>
+            <pre>// index.ts 內的工具函式
+async function sendLine(env: Env, text: string): Promise&lt;void&gt; {
+  await fetch('https://api.line.me/v2/bot/message/push', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${env.LINE_CHANNEL_ACCESS_TOKEN}`,
+    },
+    body: JSON.stringify({
+      to: env.LINE_USER_ID,
+      messages: [{ type: 'text', text }],
+    }),
+  });
+}</pre>
+            <div class="callout" style="margin-top: 12px;">
+              <strong>長度限制：</strong> LINE 文字訊息最多 5,000 字元。完成摘要標題截取前 20 字為限。
+            </div>
+          </div>
+        </section>
+
+        <!-- ════════════════════════════════════════════
+             §8 實作計畫
+        ════════════════════════════════════════════ -->
+        <section class="section" id="plan">
+          <h2>九、實作計畫</h2>
+          <table class="matrix">
+            <thead>
+              <tr><th>Phase</th><th>交付項目</th><th>驗收條件</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="badge">P0</span> Auth 基礎</td>
+                <td><code>_auth.ts</code> 修改 + Dashboard 新增 <code>PIPELINE_SECRET</code></td>
+                <td>用 Bearer token 呼叫 <code>/api/admin/ai-generate</code> 回傳 200，不影響管理員 session 登入</td>
+              </tr>
+              <tr>
+                <td><span class="badge">P0</span> KV 建立</td>
+                <td>Dashboard 建立 <code>PIPELINE_DEDUP</code> namespace</td>
+                <td>Worker 可讀寫 KV</td>
+              </tr>
+              <tr>
+                <td><span class="badge">P1</span> RSS + 分類</td>
+                <td><code>auto-pipeline/index.ts</code> 實作 2 RSS + FinMind fetch、分類評分、去重</td>
+                <td>測試：VentureBeat + Ars Technica + FinMind 都能 fetch，每類能正確選出前 5 名候選，KV dedup 正確篩除已用 URL</td>
+              </tr>
+              <tr>
+                <td><span class="badge">P1</span> Pipeline 主流程</td>
+                <td>ai-generate 草稿保留 → 最佳者 ai-cover → ai-illustrate → D1 published</td>
+                <td>手動觸發 Worker，確認 3 篇文章（AI / 産業 / 資安）各一篇生成並發佈；失敗嘗試的草稿仍留在 D1</td>
+              </tr>
+              <tr>
+                <td><span class="badge">P2</span> Cron 啟用</td>
+                <td><code>wrangler.toml</code> 設定 Cron trigger，部署至 production</td>
+                <td>隔天 07:00 自動執行，D1 出現新文章，Cloudflare Logs 無 unhandled error</td>
+              </tr>              <tr>
+                <td><span class="badge">P2</span> LINE 通知</td>
+                <td>Worker 加入 <code>sendLine()</code> 工具函式，<code>LINE_CHANNEL_ACCESS_TOKEN</code> 與 <code>LINE_USER_ID</code> 寫入 Worker Secrets</td>
+                <td>Cron 執行完成後手機收到完成訊息；0 篇時收到告警訊息</td>
+              </tr>
+              <tr>
+                <td><span class="badge">P3</span> 監控優化</td>
+                <td>每次 Cron 完成後寫入執行摘要 log（發佈篇數、跳過原因）</td>
+                <td>Dashboard Workers Logs 可追蹤每日執行結果</td>
+              </tr>
+              <tr style="background:rgba(134,240,139,.06)">
+                <td><span class="badge">P4</span> Phase 2 — D1 schema</td>
+                <td>執行 <code>0008_insights.sql</code> migration，建立 insights 表</td>
+                <td><code>npx wrangler d1 migrations apply BLOG_DB --remote</code> 成功；<code>SELECT * FROM insights LIMIT 1</code> 不報錯</td>
+              </tr>
+              <tr style="background:rgba(134,240,139,.06)">
+                <td><span class="badge">P4</span> Phase 2 — Worker 週報</td>
+                <td>index.ts 新增 <code>generateWeeklyInsights()</code>；wrangler.toml 加入 <code>0 0 * * 1</code> Cron；部署 Worker</td>
+                <td>手動觸發測試後，D1 insights 出現本週資料；LINE 收到週報通知</td>
+              </tr>
+              <tr style="background:rgba(134,240,139,.06)">
+                <td><span class="badge">P4</span> Phase 2 — 回填（一次性）</td>
+                <td>先執行 <code>node scripts/backfill-insights.mjs --weeks=4 --dry-run</code> 確認分組正確，再執行 <code>node scripts/backfill-insights.mjs --weeks=4</code> 正式寫入。<strong>資料來源：FinMind TaiwanStockNews 歷史 API（非 D1 posts）</strong>，因部署初期 D1 posts 尚空。</td>
+                <td>D1 insights 出現約 4 週 × 14 家企業歷史資料，<code>data_source='FINMIND'</code>；<code>/api/insights?weeks=16</code> 回傳有效 JSON，/trends 頁面時間軸顯示資料</td>
+              </tr>
+              <tr style="background:rgba(134,240,139,.06)">
+                <td><span class="badge">P4</span> Phase 2 — 前端</td>
+                <td>部署含 TrendsPage + Navbar 連結的前端至 Cloudflare Pages</td>
+                <td>https://blog.buclaw.org/trends 顯示時間軸，卡片展開原始標題正常；公司篩選 + 影響層級篩選正常運作</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- ════════════════════════════════════════════
+             §9 驗收矩陣
+        ════════════════════════════════════════════ -->
+        <section class="section" id="acceptance">
+          <h2>十、驗收矩陣</h2>
+          <table class="matrix">
+            <thead>
+              <tr><th>驗收項目</th><th>目標</th><th>驗收方式</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Auth 隔離</td>
+                <td>PIPELINE_SECRET 通過，session 行為不變</td>
+                <td>分別用 secret header 與 session cookie 呼叫 ai-generate，均回傳 200；移除 secret 後 Cron 呼叫回傳 401</td>
+              </tr>
+              <tr>
+                <td>RSS 收集</td>
+                <td>2 個 RSS + FinMind 全部 fetch，單源逾時不影響其他</td>
+                <td>手動將一個 RSS URL 改為無效，Cron 仍正常執行其他來源；FinMind 失敗時産業分類改用 RSS 側補足</td>
+              </tr>
+              <tr>
+                <td>分類選篇</td>
+                <td>每類最多選 1 篇，跨類不重複</td>
+                <td>觀察 3 篇發佈文章的 category 欄位，確認 3 個分類（AI / 產業 / 資安）各一篇</td>
+              </tr>
+              <tr>
+                <td>Hard Dedup</td>
+                <td>同一篇文章 30 天內只發一次</td>
+                <td>手動在 KV 寫入某篇 URL hash，確認 Cron 執行時該文章被跳過</td>
+              </tr>
+              <tr>
+                <td>備選機制</td>
+                <td>主選失敗時自動遞補</td>
+                <td>手動讓某篇 ai-generate 回傳 422，確認該分類自動改用備選 #2</td>
+              </tr>
+              <tr>
+                <td>生文品質</td>
+                <td>繁體中文，有 title / excerpt / content_html</td>
+                <td>檢查 D1 中新文章的三個欄位均非空且為繁中</td>
+              </tr>
+              <tr>
+                <td>封面圖</td>
+                <td>R2 路徑可存取，cover_image_url 已寫入</td>
+                <td>用瀏覽器開啟 cover_image_url，圖片正常顯示</td>
+              </tr>
+              <tr>
+                <td>插圖</td>
+                <td>插圖 URL 已注入 content_html 末段</td>
+                <td>blog 前台文章末段出現插圖</td>
+              </tr>
+              <tr>
+                <td>執行時間</td>
+                <td><s>6</s> 3 篇完整流程 ≤ 15 分鐘</td>
+                <td>Cloudflare Logs 顯示 Worker 執行時間 ≤ 15 分鐘</td>
+              </tr>
+              <tr>
+                <td>現有後台不受影響</td>
+                <td>手動 AiGeneratePage 功能正常</td>
+                <td>Pipeline 上線後，手動生文 + 生圖流程與上線前行為一致</td>
+              </tr>
+              <tr>
+                <td>LINE 通知</td>
+                <td>發佈完成後手機收到訊息</td>
+                <td>Cron 執行完成後，手機内 LINE 收到分類發佈摘要；手動觸發 0 篇情境時收到告警</td>
+              </tr>
+              <tr style="background:rgba(134,240,139,.06)">
+                <td>草稿保留</td>
+                <td>ai-generate 失敗的嘗試保留為 draft</td>
+                <td>人工觀察 D1 posts，確認同一天有 status='draft' 的非最佳候選文章存在</td>
+              </tr>
+              <tr style="background:rgba(134,240,139,.06)">
+                <td>insights 表寫入</td>
+                <td>週報 Cron 正確寫入 insights 表</td>
+                <td>手動觸發週報後，<code>SELECT * FROM insights ORDER BY created_at DESC LIMIT 5</code> 出現本週資料，direction 欄位非空</td>
+              </tr>
+              <tr style="background:rgba(134,240,139,.06)">
+                <td>/trends 頁面</td>
+                <td>前端時間軸顯示正確</td>
+                <td>https://blog.buclaw.org/trends 顯示 InsightCard，公司篩選 + 影響層級篩選正常；展開原始標題列表可見</td>
+              </tr>
+              <tr style="background:rgba(134,240,139,.06)">
+                <td>Phase 2 LINE 通知</td>
+                <td>週報完成後收到通知</td>
+                <td>每週一 08:00 UTC+8 手機收到「週報完成，已更新 N 家企業動向」；無資料時收到告警</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="callout danger" style="margin-top: 16px;">
+            <strong>不可回歸規則：</strong> Pipeline 上線後，ai-generate / ai-cover / ai-illustrate 三個 endpoint 的現有對外行為不得有任何改變。若 _auth.ts 改動導致管理員後台 session 失效，視為阻斷性 regression，必須立即 rollback。
+          </div>
+        </section>
+
+        <!-- ════════════════════════════════════════════
+             §10 部署 SOP
+        ════════════════════════════════════════════ -->
+        <section class="section" id="deploy-sop">
+          <h2>十一、部署 SOP</h2>
+          <p style="color:var(--muted);margin-top:0">本節記錄 <code>personal-blog-platform-auto-pipeline</code> Worker 從零開始完整上線所需的每個步驟。依照順序執行，每步有預期結果供驗證。</p>
+
+          <h3 style="margin-top:24px">前置條件</h3>
+          <table class="kv">
+            <tr><th>工具</th><td>Node.js + npx wrangler（已登入 Cloudflare）</td></tr>
+            <tr><th>工作目錄</th><td><code>projects/03-personal-blog-platform/src/web/</code></td></tr>
+            <tr><th>已存在資源</th><td>D1 <code>personal-blog-platform-db</code>、R2 <code>personal-blog-images</code>、Pages 專案 <code>personal-blog-platform</code></td></tr>
+          </table>
+
+          <h3 style="margin-top:28px">Step 1 — 建立 KV Namespace <code>PIPELINE_DEDUP</code></h3>
+          <p>路徑：Cloudflare Dashboard → Storage &amp; databases → Workers KV → <strong>+ Create Instance</strong></p>
+          <ul>
+            <li>Namespace name：<code>PIPELINE_DEDUP</code></li>
+            <li>按 Create，進入 Settings 頁取得 Namespace ID（或用 CLI）</li>
+          </ul>
+          <pre>npx wrangler kv namespace list
+# 找到 title = "PIPELINE_DEDUP" 的那筆，複製其 id</pre>
+          <p>✅ 預期結果：列表出現 <code>PIPELINE_DEDUP</code> 及其 UUID。</p>
+
+          <h3 style="margin-top:28px">Step 2 — 更新 <code>wrangler.toml</code></h3>
+          <p>將 <code>workers/auto-pipeline/wrangler.toml</code> 中的佔位符替換為真實 ID：</p>
+          <pre># 將以下這行
+id = "REPLACE_WITH_PIPELINE_DEDUP_KV_ID"
+# 改為
+id = "&lt;Step 1 取得的 Namespace ID&gt;"</pre>
+          <p>✅ 預期結果：<code>wrangler.toml</code> 內不再有 <code>REPLACE_WITH</code> 字樣。</p>
+
+          <h3 style="margin-top:28px">Step 3 — 產生 <code>PIPELINE_SECRET</code></h3>
+          <p>產生一個 ≥ 48 字元的隨機密鑰（請存入密碼管理器，後續 Step 4 和 Step 6 都會用到）：</p>
+          <pre># PowerShell
+-join ((65..90) + (97..122) + (48..57) | Get-Random -Count 48 | ForEach-Object { [char]$_ })</pre>
+
+          <h3 style="margin-top:28px">Step 4 — 設定 Pages 環境變數</h3>
+          <p>路徑：Dashboard → Workers &amp; Pages → <strong>personal-blog-platform</strong> → Settings → Variables and Secrets → <strong>+ Add</strong></p>
+          <table class="kv">
+            <tr><th>Type</th><td>Secret</td></tr>
+            <tr><th>Variable name</th><td><code>PIPELINE_SECRET</code></td></tr>
+            <tr><th>Value</th><td>Step 3 產生的值</td></tr>
+          </table>
+          <p>✅ 預期結果：列表出現 <code>PIPELINE_SECRET</code>，Value 顯示 <em>Value encrypted</em>。</p>
+
+          <h3 style="margin-top:28px">Step 5 — 首次部署 Worker</h3>
+          <div class="callout warn" style="margin-bottom:12px"><strong>注意：</strong>必須先完成 Step 2（wrangler.toml 有真實 KV ID）才能部署成功。</div>
+          <pre>cd projects/03-personal-blog-platform/src/web
+npm run cf:deploy:auto-pipeline</pre>
+          <p>✅ 預期結果：輸出包含 <code>Deployed personal-blog-platform-auto-pipeline triggers</code> 及 <code>schedule: 0 23 * * *</code>，且 Bindings 顯示 <code>PIPELINE_DEDUP</code> 和 <code>BLOG_DB</code>。</p>
+
+          <h3 style="margin-top:28px">Step 6 — 設定 Worker Secrets</h3>
+          <p>Worker 的 secrets 必須在部署後用 CLI 設定（不走 wrangler.toml）：</p>
+          <pre># PIPELINE_SECRET（同 Step 3 的值）
+Write-Output "&lt;PIPELINE_SECRET&gt;" | npx wrangler secret put PIPELINE_SECRET -c workers/auto-pipeline/wrangler.toml
+
+# LINE_CHANNEL_ACCESS_TOKEN（來自 ~/.openclaw/line-token.json 的 channelAccessToken 欄位）
+Write-Output "&lt;LINE_CHANNEL_ACCESS_TOKEN&gt;" | npx wrangler secret put LINE_CHANNEL_ACCESS_TOKEN -c workers/auto-pipeline/wrangler.toml</pre>
+          <p>✅ 預期結果：兩個指令均顯示 <code>✨ Success! Uploaded secret &lt;NAME&gt;</code>。</p>
+
+          <h3 style="margin-top:28px">Step 7 — 重新部署 Pages</h3>
+          <p>套用 <code>_auth.ts</code> Bearer fallback 和 <code>_types.ts</code> 變更：</p>
+          <pre>npm run cf:deploy</pre>
+          <p>✅ 預期結果：顯示 <code>Deployment complete!</code>。</p>
+
+          <h3 style="margin-top:28px">Step 8 — 手動測試</h3>
+          <p>用 <code>?force=1</code> 繞過每日鎖，立即觸發 pipeline：</p>
+          <pre>curl -X POST "https://personal-blog-platform-auto-pipeline.anson4139.workers.dev/run?force=1" \
+  -H "Authorization: Bearer &lt;PIPELINE_SECRET&gt;"</pre>
+          <p>✅ 預期回應：<code>{"status":"triggered","ignoreLock":true}</code>（HTTP 200）<br>
+          Pipeline 在背景執行（<code>ctx.waitUntil</code>），3–5 分鐘後 LINE 會收到通知。</p>
+
+          <h3 style="margin-top:28px">Step 9 — 驗證 D1</h3>
+          <pre>npx wrangler d1 execute personal-blog-platform-db --remote \
+  --command "SELECT id, title, status, created_at FROM posts ORDER BY id DESC LIMIT 5"</pre>
+          <p>✅ 預期結果：看到當天新建的 published 文章，表示 pipeline 正常運作。</p>
+
+          <h3 style="margin-top:28px">Step 10 — Phase 2：套用 D1 Migration</h3>
+          <pre>cd projects/03-personal-blog-platform/src/web
+npx wrangler d1 migrations apply BLOG_DB --remote</pre>
+          <p>✅ 預期結果：輸出 <code>Applying migration 0008_insights.sql</code>，完成後 <code>SELECT * FROM insights LIMIT 1</code> 不報錯。</p>
+
+          <h3 style="margin-top:28px">Step 11 — Phase 2：設定 OPENAI_API_KEY Secret</h3>
+          <pre>npx wrangler secret put OPENAI_API_KEY --config workers/auto-pipeline/wrangler.toml</pre>
+          <p>✅ 預期結果：<code>✨ Success! Uploaded secret OPENAI_API_KEY</code></p>
+
+          <h3 style="margin-top:28px">Step 12 — Phase 2：重新部署 Worker（含週報 Cron）</h3>
+          <pre>npm run cf:deploy:auto-pipeline</pre>
+          <p>✅ 預期結果：Triggers 顯示兩個 Cron：<code>0 23 * * *</code> 和 <code>0 0 * * 1</code>。</p>
+
+          <h3 style="margin-top:28px">Step 13 — Phase 2：部署前端（含 /trends 頁面）</h3>
+          <pre>npm run build
+npx wrangler pages deploy dist</pre>
+          <p>✅ 預期結果：https://blog.buclaw.org/trends 可正常存取（無 insights 資料前顯示空狀態提示）。</p>
+
+          <h3 style="margin-top:28px">Step 14 — Phase 2：回填歷史 insights 資料（一次性手動執行）</h3>
+          <div class="callout" style="margin-top:10px;margin-bottom:12px">
+            <strong>為什麼用 FinMind 而非 D1 posts？</strong> 部署初期 D1 posts 表幾乎是空的（Phase 1 才剛上線），若直接讀 D1 posts 會得到 0 筆資料。因此一次性回填改呼叫 FinMind TaiwanStockNews 歷史 API，取得過去 N 週各企業新聞標題後送 GPT-5.5 生成 insights，並以 <code>data_source='FINMIND'</code> 標記，確保 /trends 頁面在上線當天就有歷史資料可顯示。之後每週 Cron 則改用 D1 posts（<code>data_source='D1_POSTS'</code>）。
+          </div>
+          <pre># 先 dry-run 確認資料筆數與分組正確（不呼叫 OpenAI、不寫 D1）
+cd projects/03-personal-blog-platform
+node scripts/backfill-insights.mjs --weeks=4 --dry-run
+
+# 確認無誤後正式執行
+node scripts/backfill-insights.mjs --weeks=4</pre>
+          <p>✅ 預期結果：D1 insights 表出現約 4 週 × 14 家企業的歷史資料（<code>data_source='FINMIND'</code>）；https://blog.buclaw.org/trends 時間軸顯示資料。費用 ~$0.15（約 56 次 GPT-5.5 呼叫）。</p>
+        </section>
+
+        <!-- ════════════════════════════════════════════
+             §11 運維 FAQ
+        ════════════════════════════════════════════ -->
+        <section class="section" id="faq">
+          <h2>十二、運維 FAQ</h2>
+          <p style="color:var(--muted);margin-top:0">記錄初次部署實際遇到的問題與解法，供日後維護參考。</p>
+
+          <h3 style="margin-top:20px">FAQ-01 — Worker 回傳 <code>error code: 1101</code> / HTTP 500</h3>
+          <table class="kv">
+            <tr><th>症狀</th><td>呼叫 <code>/run</code> endpoint 時，回傳 <code>{"error":"error code: 1101"}</code>，HTTP 500</td></tr>
+            <tr><th>根本原因</th><td>原始 <code>fetch()</code> handler 用 <code>await runPipeline()</code> 直接等 pipeline 完成，但完整跑完 <s>6 個分類需要約 14 分鐘</s> <strong>3 個分類（AI / 產業 / 資安）約 7 分鐘</strong>，遠超 Cloudflare Worker HTTP 請求的 30 秒限制，導致 runtime 強制終止並拋出例外。</td></tr>
+            <tr><th>修法</th><td>改用 <code>ctx.waitUntil()</code>：fetch handler 立即回傳 <code>{"status":"triggered"}</code>，pipeline 繼續在背景執行不受 HTTP 超時影響。</td></tr>
+          </table>
+          <pre>// workers/auto-pipeline/index.ts — fetch handler 修法
+async fetch(request: Request, env: Env, ctx: ExecutionContext) {
+  // ... auth check ...
+  ctx.waitUntil(
+    runPipeline(env, { ignoreLock }).catch((error) => {
+      console.error("[pipeline] uncaught error:", errorMessage(error));
+    }),
+  );
+  return Response.json({ status: "triggered", ignoreLock });
+}</pre>
+
+          <h3 style="margin-top:32px">FAQ-02 — Blog 文章點開顯示「找不到這篇文章」（404）</h3>
+          <table class="kv">
+            <tr><th>症狀</th><td>首頁列表顯示 Pipeline 新產生的文章卡片，點進去卻顯示 404 頁面</td></tr>
+            <tr><th>根本原因 A</th><td><code>slugify()</code> 函式的 regex <code>\W</code> 不匹配 CJK 字元，導致中文標題的 slug 保留了中文字（例如 <code>dmtf-spdm標準納入fips-140-3-...</code>）。Cloudflare Pages 將 URL 中的中文字 percent-encode 後傳入 <code>[slug].ts</code>，但 <code>params.slug</code> 取得的是 encoded 字串，直接查 DB 查不到。</td></tr>
+            <tr><th>根本原因 B</th><td>即使解決 encoding 問題，slug 本身含中文也是非標準做法，SEO 較差且容易在各種環境中產生問題。</td></tr>
+          </table>
+          <p><strong>雙層修法：</strong></p>
+          <p><strong>Layer 1 — 修復現有文章（立即生效）</strong>：在 <code>functions/api/posts/[slug].ts</code> 加 <code>decodeURIComponent</code>，讓已存入 DB 的中文 slug 可正常查詢：</p>
+          <pre>// functions/api/posts/[slug].ts
+const slug = decodeURIComponent(params.slug as string); // 修改前為 params.slug as string</pre>
+          <p><strong>Layer 2 — 永久修復（新文章不再產生中文 slug）</strong>：修改 <code>functions/api/admin/_auth.ts</code> 的 <code>slugify()</code>，在處理前先移除 CJK 字元：</p>
+          <pre>// functions/api/admin/_auth.ts
+export function slugify(text: string): string {
+  const ascii = text
+    .toLowerCase()
+    .trim()
+    .replace(/[\u2E80-\u9FFF\uF900-\uFAFF\uFE30-\uFE4F\uFF00-\uFFEF]+/g, "-") // 移除 CJK
+    .replace(/[\s\W-]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  if (!ascii) return Date.now().toString(36); // 純中文標題 fallback
+  return ascii;
+}</pre>
+          <div class="callout" style="margin-top:12px">
+            <strong>驗證：</strong>修復後，純 ASCII slug 文章（舊）和含中文 slug 文章（新 Layer 1 修復）都能正常開啟；之後 Pipeline 產生的新文章 slug 全為純 ASCII（例如 <code>dmtf-spdm-fips-140-3-mp3uzu5o</code>）。
+          </div>
+        </section>
+
+        <!-- ════════════════════════════════════════════
+             §13 PHASE 2 — 產業趨勢分析
+        ════════════════════════════════════════════ -->
+        <section class="section" id="phase2">
+          <h2>十三、PHASE 2 — 産業趨勢分析</h2>
+          <p style="color:var(--muted);margin-top:0">Phase 2 已實作完成，程式碼已提交，等待部署（Step 10–14）。</p>
+
+          <div class="spec-block">
+            <h3>13.1 背景與動機</h3>
+            <p>PHASE 1 每天發佈 3 篇文章，一年累積約 1,000+ 篇。單篇閱讀無法看出趨勢——就像只看昨天的新聞無法判斷市場方向。PHASE 2 的目標是：</p>
+            <ul class="list">
+              <li>每週一自動掃描 D1 <code>posts</code> 表（近 7 天的 published + draft），對 14 家追蹤企業分別計算命中篇數、提取關鍵事件。</li>
+              <li>每家企業呼叫一次 GPT-5.5（最多 14 次/週），產出 <code>direction</code> + <code>key_events</code> + <code>impact</code>。</li>
+              <li>分析結果寫入 D1 <code>insights</code> 表，每週只新增不覆蓋，形成可回溯的知識庫。</li>
+              <li>前端「産業趨勢」頁（<code>/trends</code>）以時間軸呈現，可按公司 / 影響層級 / 時間範圍篩選。</li>
+            </ul>
+          </div>
+
+          <div class="spec-block" style="margin-top:16px">
+            <h3>13.2 追蹤企業清單（<code>INSIGHTS_COMPANIES</code>）</h3>
+            <p>14 家企業，分屬 AI 研究 / 半導體 / 科技巨頭三組：</p>
+            <table class="kv">
+              <tr><th>AI 研究</th><td>NVIDIA、AMD、Intel、Broadcom</td></tr>
+              <tr><th>半導體</th><td>TSMC、Samsung、鴻海</td></tr>
+              <tr><th>科技巨頭</th><td>Apple、Microsoft、Google、Amazon、Meta、Tesla、SpaceX</td></tr>
+            </table>
+          </div>
+
+          <div class="spec-block" style="margin-top:16px">
+            <h3>13.3 D1 資料架構（0008_insights.sql）</h3>
+            <pre>CREATE TABLE IF NOT EXISTS insights (
+  id            INTEGER PRIMARY KEY AUTOINCREMENT,
+  week_start    TEXT NOT NULL,           -- e.g. "2026-05-12"（週一日期）
+  entity        TEXT NOT NULL,           -- e.g. "NVIDIA"
+  entity_group  TEXT NOT NULL DEFAULT 'company',   -- e.g. "AI 研究" / "半導體" / "科技巨頭"
+  hit_count     INTEGER NOT NULL DEFAULT 0,         -- 本週命中該企業的文章篇數
+  direction     TEXT NOT NULL,           -- AI 產出的方向摘要，≤ 150 字
+  key_events    TEXT,                    -- JSON array of notable titles
+  impact        TEXT NOT NULL DEFAULT 'medium'
+                  CHECK (impact IN ('high','medium','low')),
+  source_ids    TEXT,                    -- JSON array of linked post IDs
+  data_source   TEXT NOT NULL DEFAULT 'finmind',  -- 'FINMIND'（回填）| 'D1_POSTS'（週報 Cron）
+  model_ver     TEXT,                    -- 分析時使用的 AI 模型，e.g. "gpt-5.5"
+  prompt_ver    TEXT NOT NULL DEFAULT '1.0',
+  created_at    TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_insights_week   ON insights(week_start);
+CREATE INDEX IF NOT EXISTS idx_insights_entity ON insights(entity);</pre>
+            <div class="callout" style="margin-top:12px">
+              <strong>可回溯設計：</strong> 記錄每筆分析的 <code>model_ver</code> 與 <code>prompt_ver</code>，日後模型升級時仍能區分哪些分析由同一標準產出。
+            </div>
+          </div>
+
+          <div class="spec-block" style="margin-top:16px">
+            <h3>13.4 執行架構</h3>
+            <div class="flow">
+              <div class="flow-step">Cron 每週一 08:00 UTC+8</div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-step">查 D1 posts<br>（近 7 天 published/draft）</div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-step">14 家企業<br>逐一比對 title/content</div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-step">命中 &gt; 0 → 呼叫<br>GPT-5.5 生成 insights</div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-step">寫入 D1 insights 表</div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-step">LINE 推送「N 家更新 / M 筆失敗」</div>
+            </div>
+            <table class="kv" style="margin-top:16px">
+              <tr><th>Cron 設定</th><td><code>0 0 * * 1</code>（UTC）= 每週一 08:00 UTC+8</td></tr>
+              <tr><th>資料窗口</th><td>近 7 天（week_start ~ week_start + 6）</td></tr>
+              <tr><th>AI 呼叫數</th><td>最多 14 次/週（命中 0 篇的企業自動跳過）</td></tr>
+              <tr><th>模型</th><td><strong>GPT-5.5</strong>（<code>model_ver: "gpt-5.5"</code>）</td></tr>
+              <tr><th>成本估算</th><td>14 次 × ~2,000 tokens ≈ 28,000 tokens/週 ≈ <strong>$0.05 / 週</strong></td></tr>
+              <tr><th>Fallback</th><td>企業本週命中 0 篇 → 跳過，不寫入空 row；LINE 告警若全部企業均無命中</td></tr>
+              <tr style="background:rgba(134,240,139,.06)"><th>初始回填</th><td>部署時執行 <code>node scripts/backfill-insights.mjs --weeks=4</code>（FinMind 歷史資料，非 D1 posts），約 56 次 AI 呼叫，費用 ~$0.15</td></tr>
+            </table>
+          </div>
+
+          <div class="spec-block" style="margin-top:16px">
+            <h3>13.5 前端 UI（<code>/trends</code>）</h3>
+            <table class="matrix">
+              <thead><tr><th>階段</th><th>狀態</th><th>說明</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><span class="badge">P0</span> Navbar + Route</td>
+                  <td style="color:#86f08b">已完成</td>
+                  <td>Navbar 加「産業趨勢」連結；<code>App.tsx</code> 加 <code>/trends</code> route</td>
+                </tr>
+                <tr>
+                  <td><span class="badge">P1</span> TrendsPage</td>
+                  <td style="color:#86f08b">已完成</td>
+                  <td>InsightCard 含企業名（green）+ hit_count + direction + 可展開 key_events；篩選：近 4/8/16 週 + 公司 + 影響層級</td>
+                </tr>
+                <tr>
+                  <td><span class="badge">P1</span> API endpoint</td>
+                  <td style="color:#86f08b">已完成</td>
+                  <td><code>GET /api/insights?weeks=16&amp;entity=&amp;impact=</code>，回傳 <code>{ insights, entities, meta }</code></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="spec-block" style="margin-top:16px">
+            <h3>13.6 資料品質與風險</h3>
+            <table class="matrix">
+              <thead><tr><th>風險</th><th>影響</th><th>緩解措施</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td>Phase 1 連續失敗導致本週 0 篇</td>
+                  <td>insights 無法產出</td>
+                  <td>跳過本週，LINE 推送「本週無新文章，insights 跳過」</td>
+                </tr>
+                <tr>
+                  <td>GPT-5.5 回應格式錯誤</td>
+                  <td>單家企業 insights 寫入失敗</td>
+                  <td>JSON.parse 失敗時記 console.error + 計入 LINE 告警的 M 筆失敗數</td>
+                </tr>
+                <tr>
+                  <td>AI 分析標準飄移（模型升級）</td>
+                  <td>不同週的趨勢判斷基準不一致</td>
+                  <td>每筆記錄 <code>model_ver</code> + <code>prompt_ver</code>，升級時新增版號即可區分</td>
+                </tr>
+                <tr>
+                  <td>儲存空間</td>
+                  <td>10 年 insights 不超過 50 MB</td>
+                  <td>D1 Free 500 MB，無需額外處理</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="callout warn" style="margin-top:12px">
+              <strong>可移植性：</strong> D1 支援 <code>wrangler d1 export</code> 導出完整 SQLite 備份，不綁定 Cloudflare。即使未來遷移到其他平台，歷史資料可完整帶走。
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+  <div class="footer-wrap" style="width:min(var(--content-width),calc(100% - 28px));margin:0 auto">
+    <div class="footer">22_03 Blog 自動化內容 Pipeline 系統規格書 v1.9 — 2026-05-14 — Active</div>
+  </div>
+</body>
+</html>
