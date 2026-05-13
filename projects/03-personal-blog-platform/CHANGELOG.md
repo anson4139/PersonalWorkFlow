@@ -25,6 +25,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
+- Fixed desktop navigation sizing so top-level links visually match the BLACK HARNESS family sites.
 - Fixed archive month filtering so invalid dates cannot collapse valid year/month results into an empty archive.
 - Fixed admin session expiry handling so expired sessions clear automatically and redirect back to the home page.
 - Extended AI cover and illustration image generation timeouts so production `gpt-image-2` requests can complete instead of aborting around 30 seconds.

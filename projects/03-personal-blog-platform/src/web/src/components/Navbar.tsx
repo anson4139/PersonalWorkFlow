@@ -42,7 +42,7 @@ export default function Navbar() {
         </Link>
 
         <nav
-          className="hidden md:flex items-center gap-6 text-sm font-medium"
+          className="hidden md:flex items-center gap-8 text-[1.05rem] font-semibold tracking-[0.04em]"
           style={{ color: "var(--text-dim)" }}
         >
           <Link
