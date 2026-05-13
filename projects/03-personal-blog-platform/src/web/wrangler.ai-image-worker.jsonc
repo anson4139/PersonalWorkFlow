@@ -1,0 +1,29 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "personal-blog-platform-ai-image-worker",
+  "main": "./workers/ai-image-worker.ts",
+  "compatibility_date": "2026-05-10",
+  "d1_databases": [
+    {
+      "binding": "BLOG_DB",
+      "database_name": "personal-blog-platform-db",
+      "database_id": "a0d545a4-2767-4c89-80d3-a9794fc8c830"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "BLOG_IMAGES",
+      "bucket_name": "personal-blog-images"
+    }
+  ],
+  "queues": {
+    "consumers": [
+      {
+        "queue": "blog-ai-image-jobs",
+        "max_batch_size": 1,
+        "max_batch_timeout": 5,
+        "max_retries": 0
+      }
+    ]
+  }
+}
