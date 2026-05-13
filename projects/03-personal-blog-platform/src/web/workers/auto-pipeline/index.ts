@@ -282,7 +282,7 @@ export default {
 
   async fetch(request: Request, env: Env, ctx: ExecutionContext) {
     const url = new URL(request.url);
-    if (url.pathname !== "/run") {
+    if (url.pathname !== "/run" && url.pathname !== "/line-test") {
       return Response.json({ ok: true, service: "blog-auto-pipeline" });
     }
 
@@ -292,6 +292,17 @@ export default {
       authHeader !== `Bearer ${env.PIPELINE_SECRET}`
     ) {
       return Response.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (url.pathname === "/line-test") {
+      const sent = await sendLine(
+        env,
+        `[Blog Pipeline Test] LINE 測試訊息 ${new Date().toISOString()}`,
+      );
+      return Response.json(
+        { status: sent ? "sent" : "failed", lineSent: sent },
+        { status: sent ? 200 : 502 },
+      );
     }
 
     const ignoreLock = url.searchParams.get("force") === "1";
@@ -738,7 +749,7 @@ async function urlDedupKey(url: string) {
 async function sendLine(env: Env, text: string) {
   if (!env.LINE_CHANNEL_ACCESS_TOKEN || !env.LINE_USER_ID) {
     console.warn("[pipeline] LINE credentials not configured");
-    return;
+    return false;
   }
 
   const response = await fetch("https://api.line.me/v2/bot/message/push", {
@@ -757,7 +768,10 @@ async function sendLine(env: Env, text: string) {
     console.warn(
       `[pipeline] LINE push failed HTTP ${response.status}: ${(await response.text()).slice(0, 300)}`,
     );
+    return false;
   }
+
+  return true;
 }
 
 function buildLineSummary(
