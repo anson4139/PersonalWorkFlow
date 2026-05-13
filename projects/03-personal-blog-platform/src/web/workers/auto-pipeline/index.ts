@@ -955,8 +955,7 @@ async function callOpenAiInsight(
     body: JSON.stringify({
       model: "gpt-5.5",
       messages: [{ role: "user", content: prompt }],
-      max_tokens: 120,
-      temperature: 0.3,
+      max_completion_tokens: 120,
     }),
     signal: AbortSignal.timeout(20000),
   });

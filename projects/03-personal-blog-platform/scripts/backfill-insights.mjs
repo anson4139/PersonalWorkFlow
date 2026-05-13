@@ -53,20 +53,20 @@ const PROMPT_VER = "1.0";
  *   keywords - strings to match against FinMind title (case-insensitive)
  */
 const COMPANIES = [
-  { name: "TSMC",      group: "半導體",   keywords: ["台積電", "tsmc"] },
-  { name: "鴻海",      group: "半導體",   keywords: ["鴻海", "foxconn"] },
-  { name: "Samsung",   group: "半導體",   keywords: ["三星", "samsung"] },
-  { name: "NVIDIA",    group: "AI 研究",  keywords: ["輝達", "nvidia"] },
-  { name: "Intel",     group: "AI 研究",  keywords: ["英特爾", "intel"] },
-  { name: "AMD",       group: "AI 研究",  keywords: ["amd"] },
-  { name: "Broadcom",  group: "AI 研究",  keywords: ["broadcom", "博通"] },
-  { name: "Apple",     group: "科技巨頭", keywords: ["蘋果", "apple"] },
+  { name: "TSMC", group: "半導體", keywords: ["台積電", "tsmc"] },
+  { name: "鴻海", group: "半導體", keywords: ["鴻海", "foxconn"] },
+  { name: "Samsung", group: "半導體", keywords: ["三星", "samsung"] },
+  { name: "NVIDIA", group: "AI 研究", keywords: ["輝達", "nvidia"] },
+  { name: "Intel", group: "AI 研究", keywords: ["英特爾", "intel"] },
+  { name: "AMD", group: "AI 研究", keywords: ["amd"] },
+  { name: "Broadcom", group: "AI 研究", keywords: ["broadcom", "博通"] },
+  { name: "Apple", group: "科技巨頭", keywords: ["蘋果", "apple"] },
   { name: "Microsoft", group: "科技巨頭", keywords: ["microsoft", "微軟"] },
-  { name: "Google",    group: "科技巨頭", keywords: ["google"] },
-  { name: "Amazon",    group: "科技巨頭", keywords: ["amazon", "亞馬遜"] },
-  { name: "Meta",      group: "科技巨頭", keywords: ["meta"] },
-  { name: "Tesla",     group: "科技巨頭", keywords: ["tesla", "特斯拉"] },
-  { name: "SpaceX",    group: "科技巨頭", keywords: ["spacex"] },
+  { name: "Google", group: "科技巨頭", keywords: ["google"] },
+  { name: "Amazon", group: "科技巨頭", keywords: ["amazon", "亞馬遜"] },
+  { name: "Meta", group: "科技巨頭", keywords: ["meta"] },
+  { name: "Tesla", group: "科技巨頭", keywords: ["tesla", "特斯拉"] },
+  { name: "SpaceX", group: "科技巨頭", keywords: ["spacex"] },
 ];
 
 // --- Helpers -----------------------------------------------------------------
@@ -99,7 +99,10 @@ function monthChunks(startDate, endDate) {
     const from = cur.toISOString().slice(0, 10);
     const tmp = new Date(cur);
     tmp.setUTCMonth(tmp.getUTCMonth() + 1, 0);
-    const to = tmp > end ? end.toISOString().slice(0, 10) : tmp.toISOString().slice(0, 10);
+    const to =
+      tmp > end
+        ? end.toISOString().slice(0, 10)
+        : tmp.toISOString().slice(0, 10);
     ranges.push([from, to]);
     cur = new Date(tmp);
     cur.setUTCDate(cur.getUTCDate() + 1);
@@ -129,7 +132,8 @@ async function fetchFinMind(token, startDate, endDate) {
   });
   if (!res.ok) throw new Error(`FinMind HTTP ${res.status}`);
   const json = await res.json();
-  if (json.status !== 200) throw new Error(`FinMind API status ${json.status}: ${json.msg}`);
+  if (json.status !== 200)
+    throw new Error(`FinMind API status ${json.status}: ${json.msg}`);
   return json.data ?? [];
 }
 
@@ -154,8 +158,7 @@ async function generateInsight(openaiKey, company, weekStart, titles) {
     body: JSON.stringify({
       model: MODEL_VER,
       messages: [{ role: "user", content: prompt }],
-      max_tokens: 120,
-      temperature: 0.3,
+      max_completion_tokens: 120,
     }),
     signal: AbortSignal.timeout(20000),
   });
@@ -168,7 +171,9 @@ async function generateInsight(openaiKey, company, weekStart, titles) {
 
 const DRY_RUN = process.argv.includes("--dry-run");
 const weeksArg = process.argv.find((a) => a.startsWith("--weeks="));
-const BACKFILL_WEEKS = weeksArg ? parseInt(weeksArg.split("=")[1], 10) : DEFAULT_WEEKS;
+const BACKFILL_WEEKS = weeksArg
+  ? parseInt(weeksArg.split("=")[1], 10)
+  : DEFAULT_WEEKS;
 
 async function main() {
   // 1. Load credentials
@@ -181,11 +186,14 @@ async function main() {
     process.exit(1);
   }
   if (!OPENAI_API_KEY) {
-    console.error("ERROR: OPENAI_API_KEY not found in .dev.vars or environment");
+    console.error(
+      "ERROR: OPENAI_API_KEY not found in .dev.vars or environment",
+    );
     process.exit(1);
   }
 
-  if (DRY_RUN) console.log("[backfill] DRY RUN — no OpenAI calls, no D1 writes");
+  if (DRY_RUN)
+    console.log("[backfill] DRY RUN — no OpenAI calls, no D1 writes");
 
   // 2. Apply D1 migration (idempotent)
   if (!DRY_RUN) {
@@ -237,10 +245,13 @@ async function main() {
     if (!weekStart) continue;
 
     for (const company of COMPANIES) {
-      if (company.keywords.some((kw) => titleLower.includes(kw.toLowerCase()))) {
+      if (
+        company.keywords.some((kw) => titleLower.includes(kw.toLowerCase()))
+      ) {
         if (!grouped.has(company.name)) grouped.set(company.name, new Map());
         const weeks = grouped.get(company.name);
-        if (!weeks.has(weekStart)) weeks.set(weekStart, { company, titles: [] });
+        if (!weeks.has(weekStart))
+          weeks.set(weekStart, { company, titles: [] });
         weeks.get(weekStart).titles.push(row.title);
         break; // count each article once
       }
@@ -253,14 +264,18 @@ async function main() {
     console.log(`  ${companyName}: ${weeks.size} weeks, ${count} total hits`);
     totalGroups += weeks.size;
   }
-  console.log(`[backfill] Groups to process: ${totalGroups} (= GPT calls in non-dry-run)`);
+  console.log(
+    `[backfill] Groups to process: ${totalGroups} (= GPT calls in non-dry-run)`,
+  );
 
   // 6. Generate AI summaries
   const inserts = [];
   let aiCalls = 0;
 
   for (const [companyName, weeks] of grouped) {
-    for (const [weekStart, { company, titles }] of [...weeks.entries()].sort()) {
+    for (const [weekStart, { company, titles }] of [
+      ...weeks.entries(),
+    ].sort()) {
       if (titles.length === 0) continue;
 
       let direction = "";
@@ -272,14 +287,21 @@ async function main() {
       } else {
         try {
           await sleep(OPENAI_DELAY_MS);
-          direction = await generateInsight(OPENAI_API_KEY, companyName, weekStart, titles);
+          direction = await generateInsight(
+            OPENAI_API_KEY,
+            companyName,
+            weekStart,
+            titles,
+          );
           modelVer = MODEL_VER;
           aiCalls++;
           console.log(
             `  [AI] ${companyName} ${weekStart} (${titles.length} hits) → "${direction.slice(0, 60)}..."`,
           );
         } catch (err) {
-          console.warn(`  [WARN] AI failed for ${companyName} ${weekStart}: ${err.message}`);
+          console.warn(
+            `  [WARN] AI failed for ${companyName} ${weekStart}: ${err.message}`,
+          );
           direction = `${companyName} 本週出現 ${titles.length} 筆相關新聞，動向待分析。`;
           modelVer = "fallback";
         }
@@ -335,7 +357,9 @@ async function main() {
     { cwd: ROOT, stdio: "inherit" },
   );
 
-  console.log("\n[backfill] Done! insights table populated with FinMind history.");
+  console.log(
+    "\n[backfill] Done! insights table populated with FinMind history.",
+  );
 }
 
 main().catch((err) => {
