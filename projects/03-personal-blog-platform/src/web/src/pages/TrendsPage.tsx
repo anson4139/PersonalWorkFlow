@@ -24,10 +24,30 @@ const COMPANY_GROUPS: [string, string[]][] = [
 // ─── Impact palette ───────────────────────────────────────────────────────────
 
 const IMPACT = {
-  high: { label: "高影響", Icon: Flame, color: "#f87171" },
-  medium: { label: "中影響", Icon: TrendingUp, color: "#4ade80" },
-  low: { label: "低影響", Icon: Minus, color: "#6b7280" },
+  high: {
+    label: "高影響",
+    shortLabel: "立即看",
+    description: "新聞量大或牽動供應鏈、股價、策略方向，適合先排進決策討論。",
+    Icon: Flame,
+    color: "#f87171",
+  },
+  medium: {
+    label: "中影響",
+    shortLabel: "持續追",
+    description: "訊號明確但尚未全面擴散，適合列入觀察清單並等待後續確認。",
+    Icon: TrendingUp,
+    color: "#4ade80",
+  },
+  low: {
+    label: "低影響",
+    shortLabel: "先留意",
+    description: "事件量少或還在早期階段，暫不急著行動，但可作為弱訊號保存。",
+    Icon: Minus,
+    color: "#6b7280",
+  },
 } as const;
+
+const IMPACT_ORDER: Insight["impact"][] = ["high", "medium", "low"];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -68,6 +88,71 @@ function ImpactPill({ impact }: { impact: Insight["impact"] }) {
       <Icon size={10} />
       {label}
     </span>
+  );
+}
+
+function ImpactSummary({ insights }: { insights: Insight[] }) {
+  const counts = IMPACT_ORDER.reduce(
+    (acc, impact) => ({
+      ...acc,
+      [impact]: insights.filter((item) => item.impact === impact).length,
+    }),
+    { high: 0, medium: 0, low: 0 } as Record<Insight["impact"], number>,
+  );
+
+  return (
+    <section
+      className="grid gap-3 mb-5"
+      style={{ gridTemplateColumns: "repeat(auto-fit, minmax(13rem, 1fr))" }}
+      aria-label="影響等級統計"
+    >
+      {IMPACT_ORDER.map((impact) => {
+        const { label, shortLabel, description, Icon, color } = IMPACT[impact];
+        return (
+          <div
+            key={impact}
+            className="rounded-xl p-3.5 min-h-[7.25rem]"
+            style={{
+              background: "var(--surface-2)",
+              border: `1px solid ${color}33`,
+            }}
+          >
+            <div className="flex items-center justify-between gap-3 mb-2">
+              <div className="flex items-center gap-1.5 min-w-0">
+                <Icon size={13} style={{ color }} />
+                <span
+                  className="text-xs font-bold whitespace-nowrap"
+                  style={{ color }}
+                >
+                  {label}
+                </span>
+              </div>
+              <span
+                className="text-2xl font-black leading-none"
+                style={{
+                  color: "var(--text)",
+                  fontFamily: "'Barlow Condensed', sans-serif",
+                }}
+              >
+                {counts[impact]}
+              </span>
+            </div>
+            <div
+              className="text-xs font-medium mb-1"
+              style={{ color: "var(--text)" }}
+            >
+              {shortLabel}
+            </div>
+            <p
+              className="text-xs leading-relaxed"
+              style={{ color: "var(--text-dim)" }}
+            >
+              {description}
+            </p>
+          </div>
+        );
+      })}
+    </section>
   );
 }
 
@@ -338,12 +423,12 @@ export default function TrendsPage() {
 
   /** Insights for this week, sorted high → medium → low, then by hit_count desc */
   const weekInsights = useMemo(() => {
-    const ord = { high: 0, medium: 1, low: 2 } as const;
     return allInsights
       .filter((i) => i.week_start === currentWeek)
       .sort((a, b) => {
-        if (ord[a.impact] !== ord[b.impact])
-          return ord[a.impact] - ord[b.impact];
+        const aRank = IMPACT_ORDER.indexOf(a.impact);
+        const bRank = IMPACT_ORDER.indexOf(b.impact);
+        if (aRank !== bRank) return aRank - bRank;
         return b.hit_count - a.hit_count;
       });
   }, [allInsights, currentWeek]);
@@ -470,6 +555,8 @@ export default function TrendsPage() {
           </div>
         )}
       </div>
+
+      {weekInsights.length > 0 && <ImpactSummary insights={weekInsights} />}
 
       {/* ── Empty week */}
       {weekInsights.length === 0 && (
