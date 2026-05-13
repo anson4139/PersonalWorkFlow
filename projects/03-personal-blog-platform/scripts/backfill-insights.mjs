@@ -90,24 +90,16 @@ function isoWeekStart(dateStr) {
   return d.toISOString().slice(0, 10);
 }
 
-/** Split date range into monthly chunks for FinMind pagination */
-function monthChunks(startDate, endDate) {
-  const ranges = [];
+/** Returns each date in a date range; TaiwanStockNews only supports one day per request. */
+function dateRangeDays(startDate, endDate) {
+  const days = [];
   let cur = new Date(startDate + "T00:00:00Z");
   const end = new Date(endDate + "T00:00:00Z");
   while (cur <= end) {
-    const from = cur.toISOString().slice(0, 10);
-    const tmp = new Date(cur);
-    tmp.setUTCMonth(tmp.getUTCMonth() + 1, 0);
-    const to =
-      tmp > end
-        ? end.toISOString().slice(0, 10)
-        : tmp.toISOString().slice(0, 10);
-    ranges.push([from, to]);
-    cur = new Date(tmp);
+    days.push(cur.toISOString().slice(0, 10));
     cur.setUTCDate(cur.getUTCDate() + 1);
   }
-  return ranges;
+  return days;
 }
 
 function sleep(ms) {
@@ -120,11 +112,10 @@ function sqlEscape(str) {
 
 // --- FinMind fetch -----------------------------------------------------------
 
-async function fetchFinMind(token, startDate, endDate) {
+async function fetchFinMind(token, date) {
   const url =
     `https://api.finmindtrade.com/api/v4/data?dataset=TaiwanStockNews` +
-    `&start_date=${encodeURIComponent(startDate)}` +
-    `&end_date=${encodeURIComponent(endDate)}` +
+    `&start_date=${encodeURIComponent(date)}` +
     `&token=${encodeURIComponent(token)}`;
   const res = await fetch(url, {
     headers: { "User-Agent": "blog-backfill/1.0" },
@@ -206,6 +197,19 @@ async function main() {
     } catch {
       console.warn("[backfill] Migration may already be applied — continuing");
     }
+    console.log(
+      "[backfill] Applying D1 migration 0009_insights_unique.sql ...",
+    );
+    try {
+      execSync(
+        `npx wrangler d1 execute BLOG_DB --remote --file=src/web/migrations/0009_insights_unique.sql`,
+        { cwd: ROOT, stdio: "inherit" },
+      );
+    } catch {
+      console.warn(
+        "[backfill] Unique index may already be applied — continuing",
+      );
+    }
   }
 
   // 3. Compute date range
@@ -214,18 +218,18 @@ async function main() {
   const startDt = new Date(today);
   startDt.setDate(startDt.getDate() - BACKFILL_WEEKS * 7);
   const startStr = startDt.toISOString().slice(0, 10);
-  const chunks = monthChunks(startStr, endStr);
+  const days = dateRangeDays(startStr, endStr);
 
   console.log(
-    `[backfill] Fetching FinMind data: ${startStr} → ${endStr} (${BACKFILL_WEEKS} weeks, ${chunks.length} chunk(s))`,
+    `[backfill] Fetching FinMind data: ${startStr} → ${endStr} (${BACKFILL_WEEKS} weeks, ${days.length} day(s))`,
   );
 
   // 4. Fetch FinMind data
   let allNews = [];
-  for (const [from, to] of chunks) {
-    process.stdout.write(`[backfill] FinMind ${from} → ${to} ... `);
+  for (const date of days) {
+    process.stdout.write(`[backfill] FinMind ${date} ... `);
     try {
-      const rows = await fetchFinMind(FINMIND_TOKEN, from, to);
+      const rows = await fetchFinMind(FINMIND_TOKEN, date);
       console.log(`${rows.length} rows`);
       allNews = allNews.concat(rows);
       await sleep(600); // be polite to FinMind

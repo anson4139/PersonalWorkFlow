@@ -23,6 +23,23 @@ interface InsightRow {
   created_at: string;
 }
 
+function parseKeyEvents(value: string | null) {
+  if (!value) return [];
+  try {
+    const parsed = JSON.parse(value);
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .map((item) => {
+        if (typeof item === "string") return item;
+        if (item && typeof item.title === "string") return item.title;
+        return "";
+      })
+      .filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
 export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
   const url = new URL(request.url);
   const entity = url.searchParams.get("entity"); // filter by company
@@ -59,7 +76,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
       .all<InsightRow>();
     const rows = (result.results ?? []).map((r) => ({
       ...r,
-      key_events: r.key_events ? JSON.parse(r.key_events) : [],
+      key_events: parseKeyEvents(r.key_events),
     }));
 
     // Also return distinct entities for filter UI

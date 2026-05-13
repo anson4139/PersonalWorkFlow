@@ -90,3 +90,6 @@ src/*/dist/
 
 # AI session backup
 docs/knowledge/memory/*.bak
+
+# Generated deployment/backfill artifacts
+projects/03-personal-blog-platform/scripts/backfill-insights.sql

@@ -13,8 +13,8 @@ import { getInsights } from "../lib/api";
 // ─── Company roster (always shown even with no data) ─────────────────────────
 
 const COMPANY_GROUPS: [string, string[]][] = [
-  ["半導體", ["TSMC", "鴻海", "Broadcom"]],
-  ["AI 研究", ["NVIDIA", "AMD", "Intel"]],
+  ["半導體", ["TSMC", "鴻海", "Samsung"]],
+  ["AI 研究", ["NVIDIA", "AMD", "Intel", "Broadcom"]],
   [
     "科技巨頭",
     ["Apple", "Microsoft", "Google", "Amazon", "Meta", "Tesla", "SpaceX"],
