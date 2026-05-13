@@ -23,18 +23,35 @@ interface InsightRow {
   created_at: string;
 }
 
+function normalizeEventTitle(title: string) {
+  return title
+    .normalize("NFKC")
+    .toLowerCase()
+    .replace(
+      /\s+[-|｜]\s*(msn|聯合新聞網|經濟日報|ettoday財經雲|yahoo股市|鉅亨網|moneydj理財網|cnyes\.com)$/i,
+      "",
+    )
+    .replace(/[\s\u3000"'“”‘’|｜:：,，.。!！?？;；、\-—–_()/（）【】]+/g, "");
+}
+
 function parseKeyEvents(value: string | null) {
   if (!value) return [];
   try {
     const parsed = JSON.parse(value);
     if (!Array.isArray(parsed)) return [];
+    const seen = new Set<string>();
     return parsed
       .map((item) => {
         if (typeof item === "string") return item;
         if (item && typeof item.title === "string") return item.title;
         return "";
       })
-      .filter(Boolean);
+      .filter((title) => {
+        const key = normalizeEventTitle(title);
+        if (!key || seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
   } catch {
     return [];
   }

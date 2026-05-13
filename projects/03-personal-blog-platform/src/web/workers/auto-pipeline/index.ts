@@ -223,6 +223,23 @@ const INSIGHTS_COMPANIES: Array<{
   { name: "SpaceX", group: "科技巨頭", keywords: ["spacex"] },
 ];
 
+function normalizeInsightTitle(title: string): string {
+  return title
+    .normalize("NFKC")
+    .toLowerCase()
+    .replace(/[\s\u3000"'“”‘’|｜:：,，.。!！?？;；、\-—–_()/（）【】]+/g, "");
+}
+
+function uniqueInsightItems<T extends { title: string }>(items: T[]): T[] {
+  const seen = new Set<string>();
+  return items.filter((item) => {
+    const key = normalizeInsightTitle(item.title);
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 const RSS_TIMEOUT_MS = 10000;
 const API_TIMEOUT_MS = 45000;
 const IMAGE_JOB_TIMEOUT_MS = 110000;
@@ -868,12 +885,13 @@ async function generateWeeklyInsights(env: Env) {
   let failed = 0;
 
   for (const [companyName, { company, items }] of groups.entries()) {
-    if (items.length === 0) continue;
+    const dedupedItems = uniqueInsightItems(items);
+    if (dedupedItems.length === 0) continue;
 
-    const titles = items.map((p) => p.title);
-    const sourceIds = JSON.stringify(items.map((p) => p.id));
+    const titles = dedupedItems.map((p) => p.title);
+    const sourceIds = JSON.stringify(dedupedItems.map((p) => p.id));
     const keyEvents = JSON.stringify(
-      items.slice(0, 5).map((p) => ({ title: p.title, slug: p.slug })),
+      dedupedItems.slice(0, 5).map((p) => ({ title: p.title, slug: p.slug })),
     );
 
     let direction: string;
@@ -890,25 +908,39 @@ async function generateWeeklyInsights(env: Env) {
       console.warn(
         `[insights] AI failed for ${companyName}: ${errorMessage(err)}`,
       );
-      direction = `${companyName} 本週出現 ${items.length} 篇相關文章。`;
+      direction = `${companyName} 本週出現 ${dedupedItems.length} 篇相關文章。`;
       modelVer = "fallback";
     }
 
     const impact =
-      items.length >= 5 ? "high" : items.length >= 2 ? "medium" : "low";
+      dedupedItems.length >= 5
+        ? "high"
+        : dedupedItems.length >= 2
+          ? "medium"
+          : "low";
 
     try {
       await env.BLOG_DB.prepare(
         `INSERT INTO insights
            (week_start, entity, entity_group, hit_count, direction, key_events, impact,
             source_ids, data_source, model_ver, prompt_ver)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'D1_POSTS', ?, '1.0')`,
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'D1_POSTS', ?, '1.0')
+         ON CONFLICT(week_start, entity, data_source) DO UPDATE SET
+           entity_group=excluded.entity_group,
+           hit_count=excluded.hit_count,
+           direction=excluded.direction,
+           key_events=excluded.key_events,
+           impact=excluded.impact,
+           source_ids=excluded.source_ids,
+           model_ver=excluded.model_ver,
+           prompt_ver=excluded.prompt_ver,
+           created_at=datetime('now')`,
       )
         .bind(
           weekStart,
           companyName,
           company.group,
-          items.length,
+          dedupedItems.length,
           direction,
           keyEvents,
           impact,
