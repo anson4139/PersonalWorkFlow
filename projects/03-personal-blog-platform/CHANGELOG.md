@@ -27,5 +27,5 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Fixed archive month filtering so invalid dates cannot collapse valid year/month results into an empty archive.
 - Fixed admin session expiry handling so expired sessions clear automatically and redirect back to the home page.
 - Extended AI cover and illustration image generation timeouts so production `gpt-image-2` requests can complete instead of aborting around 30 seconds.
-- Fixed industry trend insights to deduplicate repeated or near-identical event titles before calculating hit counts and rendering key events.
+- Fixed industry trend insights to deduplicate repeated or near-identical event titles, including source suffix variants joined with spaces, hyphens, or pipes, before calculating hit counts and rendering key events.
 - Fixed Phase 0 insights backfill to query FinMind `TaiwanStockNews` one day at a time, normalize trend event titles for the public API, and prevent duplicate source rows on repeated backfills.
