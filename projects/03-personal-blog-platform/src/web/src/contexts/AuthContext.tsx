@@ -136,7 +136,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const openLoginModal = useCallback(() => setLoginModalOpen(true), []);
   const closeLoginModal = useCallback(() => setLoginModalOpen(false), []);
 
-  const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined;
+  const buildClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID as
+    | string
+    | undefined;
+  const [clientId, setClientId] = useState<string | undefined>(buildClientId);
 
   // Restore session from localStorage on mount
   useEffect(() => {
@@ -198,6 +201,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     },
     [],
   );
+
+  useEffect(() => {
+    if (clientId) return;
+
+    let cancelled = false;
+    fetch("/api/auth/config")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: { googleClientId?: string | null } | null) => {
+        if (cancelled) return;
+        if (data?.googleClientId) {
+          setClientId(data.googleClientId);
+        } else {
+          setLoading(false);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [clientId]);
 
   // Load GIS script and initialise
   useEffect(() => {

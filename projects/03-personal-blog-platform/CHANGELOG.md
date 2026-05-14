@@ -25,6 +25,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
+- Fixed the login button staying disabled on production builds by loading the Google OAuth client ID from a runtime auth config endpoint when no Vite build-time variable is present.
 - Fixed the daily auto-pipeline so publishing no longer blocks on cover and illustration job completion, preventing the third category from being left as a draft when image generation takes too long.
 - Fixed desktop navigation sizing so top-level links visually match the BLACK HARNESS family sites.
 - Fixed archive month filtering so invalid dates cannot collapse valid year/month results into an empty archive.
