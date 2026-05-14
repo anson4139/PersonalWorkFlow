@@ -263,8 +263,6 @@ function uniqueInsightItems<T extends { title: string }>(items: T[]): T[] {
 
 const RSS_TIMEOUT_MS = 10000;
 const API_TIMEOUT_MS = 45000;
-const IMAGE_JOB_TIMEOUT_MS = 110000;
-const IMAGE_JOB_POLL_MS = 5000;
 const MAX_ATTEMPTS_PER_CATEGORY = 5;
 const DEDUP_TTL_SECONDS = 60 * 60 * 24 * 30;
 const LOCK_TTL_SECONDS = 60 * 60 * 26;
@@ -525,55 +523,11 @@ async function publishCandidate(
     throw new Error("ai-generate content too short");
   }
 
-  const cover = await apiJson<ImageJobResponse>(env, "/api/admin/ai-cover", {
-    method: "POST",
-    body: JSON.stringify({
-      post_id: generated.post_id,
-      title: generated.title,
-      excerpt: generated.excerpt,
-      cover_style: category.coverStyle,
-    }),
-  });
-
-  if (cover.job_id)
-    await waitForImageJob(env, cover.job_id, IMAGE_JOB_TIMEOUT_MS);
-
   try {
-    const prepared = await apiJson<ImageJobResponse>(
-      env,
-      "/api/admin/ai-illustrate",
-      {
-        method: "POST",
-        body: JSON.stringify({
-          post_id: generated.post_id,
-          title: generated.title,
-          excerpt: generated.excerpt,
-          cover_style: category.coverStyle,
-          article_style: "4",
-        }),
-      },
-    );
-
-    if (prepared.img_prompt) {
-      const queued = await apiJson<ImageJobResponse>(
-        env,
-        "/api/admin/ai-illustrate",
-        {
-          method: "PUT",
-          body: JSON.stringify({
-            post_id: generated.post_id,
-            title: generated.title,
-            img_prompt: prepared.img_prompt,
-            prompt_src: prepared.prompt_src,
-          }),
-        },
-      );
-      if (queued.job_id)
-        await waitForImageJob(env, queued.job_id, IMAGE_JOB_TIMEOUT_MS);
-    }
+    await queuePostImages(env, category, generated);
   } catch (error) {
     console.warn(
-      `[pipeline] illustration degraded post_id=${generated.post_id}: ${errorMessage(error)}`,
+      `[pipeline] image queue degraded post_id=${generated.post_id}: ${errorMessage(error)}`,
     );
   }
 
@@ -595,21 +549,53 @@ async function publishCandidate(
   };
 }
 
-async function waitForImageJob(env: Env, jobId: string, timeoutMs: number) {
-  const deadline = Date.now() + timeoutMs;
-  while (Date.now() < deadline) {
-    const job = await apiJson<ImageJobResponse>(
+async function queuePostImages(
+  env: Env,
+  category: CategorySpec,
+  generated: AiGenerateResponse,
+) {
+  await apiJson<ImageJobResponse>(env, "/api/admin/ai-cover", {
+    method: "POST",
+    body: JSON.stringify({
+      post_id: generated.post_id,
+      title: generated.title,
+      excerpt: generated.excerpt,
+      cover_style: category.coverStyle,
+    }),
+  });
+
+  try {
+    const prepared = await apiJson<ImageJobResponse>(
       env,
-      `/api/admin/ai-image-jobs?job_id=${encodeURIComponent(jobId)}`,
-      { method: "GET" },
-      15000,
+      "/api/admin/ai-illustrate",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          post_id: generated.post_id,
+          title: generated.title,
+          excerpt: generated.excerpt,
+          cover_style: category.coverStyle,
+          article_style: "4",
+        }),
+      },
     );
-    if (job.status === "ready") return job;
-    if (job.status === "failed")
-      throw new Error(job.error || `image job failed: ${jobId}`);
-    await delay(IMAGE_JOB_POLL_MS);
+
+    if (prepared.img_prompt) {
+      await apiJson<ImageJobResponse>(env, "/api/admin/ai-illustrate", {
+        method: "PUT",
+        body: JSON.stringify({
+          post_id: generated.post_id,
+          title: generated.title,
+          img_prompt: prepared.img_prompt,
+          prompt_src: prepared.prompt_src,
+        }),
+      });
+    }
+  } catch (error) {
+    console.warn(
+      `[pipeline] illustration degraded post_id=${generated.post_id}: ${errorMessage(error)}`,
+    );
   }
-  throw new Error(`image job timeout: ${jobId}`);
 }
 
 async function apiJson<T>(
